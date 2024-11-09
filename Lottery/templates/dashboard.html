@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel użytkownika</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="dashboard-container">
+        <h2>Witaj, {{ username }}!</h2>
+        <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.</p>
+
+        <div class="section">
+            <h3>Rozpocznij losowanie</h3>
+            <a href="#" class="dashboard-link">Rozpocznij losowanie</a>
+        </div>
+
+        <!-- Sekcja listy życzeń -->
+        <div class="section">
+            <h3>Twoja lista życzeń:</h3>
+            <table class="wishlist-table">
+                <tbody>
+                    {% for item in wishlist %}
+                        <tr data-item="{{ item.name }}">
+                            <td>
+                                <span class="item-name">{{ item.name }}</span>
+                                <span class="item-description">{{ item.description }}</span>
+                            </td>
+                            <td><span class="edit-icon" onclick="editItem(event, '{{ item.name }}', '{{ item.description }}')">✎</span></td>
+                            <td><span class="remove-icon" onclick="removeItem(event, '{{ item.name }}')">×</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Formularz dodawania nowego życzenia -->
+            <form id="wishlist-form">
+                <h4>Dodaj przedmiot</h4>
+                <input type="text" id="wishlist_item" name="wishlist_item" placeholder="Nazwa przedmiotu" required>
+                <input type="text" id="wishlist_description" name="wishlist_description" placeholder="Opis przedmiotu">
+                <button type="submit">Dodaj</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <a href="{{ url_for('logout') }}" class="dashboard-link logout">Wyloguj się</a>
+        </div>
+    </div>
+
+    <script>
+        function editItem(event, itemName, itemDescription) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Znajdź wiersz i komórki do edycji
+            const row = event.target.closest("tr");
+            const nameCell = row.querySelector(".item-name");
+            const descCell = row.querySelector(".item-description");
+
+            // Utwórz pola tekstowe dla edycji
+            nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name">`;
+            descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
+
+            // Dodaj osobną komórkę dla ikony zapisu
+            const editIconCell = row.querySelector(".edit-icon").parentElement;
+            editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, '${itemName}')">💾</span>`;
+        }
+
+        function saveItem(event, originalName) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Pobierz wiersz, nowe wartości z pól tekstowych
+            const row = event.target.closest("tr");
+            const newName = row.querySelector(".edit-name").value;
+            const newDescription = row.querySelector(".edit-description").value;
+
+            // Logowanie do konsoli dla debugowania
+            console.log("Wysyłanie danych do serwera:", { originalName, newName, newDescription });
+
+            // Wyślij zmienione dane na serwer
+            fetch("{{ url_for('edit_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ original_name: originalName, new_name: newName, new_description: newDescription })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Zaktualizuj komórki z nowymi wartościami
+                    row.querySelector(".item-name").innerText = newName;
+                    row.querySelector(".item-description").innerText = newDescription;
+
+                    // Przywróć ikonę edycji zamiast ikony zapisu
+                    const saveIconCell = row.querySelector(".save-icon").parentElement;
+                    saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, '${newName}', '${newDescription}')">✎</span>`;
+                } else {
+                    alert(data.error || "Wystąpił błąd podczas zapisywania zmian.");
+                }
+            })
+            .catch(error => console.error("Błąd:", error));
+        }
+
+
+        function removeItem(event, item) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            fetch("{{ url_for('remove_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ wishlist_item: item })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-item="${item}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                } else {
+                    alert(data.error || "Wystąpił błąd podczas usuwania przedmiotu.");
+                }
+            })
+            .catch(error => console.error("Błąd:", error));
+        }
+
+        document.getElementById("wishlist-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const wishlistItem = document.getElementById("wishlist_item").value;
+            const wishlistDescription = document.getElementById("wishlist_description").value;
+
+            fetch("{{ url_for('add_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ wishlist_item: wishlistItem, wishlist_description: wishlistDescription })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tableBody = document.querySelector(".wishlist-table tbody");
+                    const newRow = document.createElement("tr");
+                    newRow.setAttribute("data-item", data.item);
+
+                    newRow.innerHTML = `
+                        <td>
+                            <span class="item-name">${data.item}</span>
+                            <span class="item-description">${data.description}</span>
+                        </td>
+                        <td><span class="edit-icon" onclick="editItem(event, '${data.item}', '${data.description}')">✎</span></td>
+                        <td><span class="remove-icon" onclick="removeItem(event, '${data.item}')">×</span></td>
+                    `;
+
+                    tableBody.appendChild(newRow);
+                    document.getElementById("wishlist_item").value = "";
+                    document.getElementById("wishlist_description").value = "";
+                } else {
+                    alert(data.error || "Wystąpił błąd podczas dodawania przedmiotu.");
+                }
+            })
+            .catch(error => console.error("Błąd:", error));
+        });
+    </script>
+</body>
+</html>
