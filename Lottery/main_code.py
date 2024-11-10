@@ -46,49 +46,47 @@ def main_draw(person_id, family_data_path, pool_files_paths, assignment_path):
     return drawn_person
 
 def generate_valid_assignment(family_data, choosing_data, chosen_data):
-    """
-    Funkcja generuje poprawne przypisanie losowania, upewniając się, że każda osoba
-    losuje inną osobę, a nie swojego małżonka ani siebie.
-    """
+    for person_id in choosing_data :
+        print(person_id, choosing_data[person_id])
+        print(choosing_data[person_id]["choosable"])
+    # print(family_data[person_id])
+    people = [person_id for person_id in choosing_data if family_data[person_id]["choosable"]]
+    possible_draws = [person_id for person_id in chosen_data if family_data[person_id]["choosable"]]
     
-    valid = False
-    people = list(choosing_data.keys())
-    possible_draws = list(chosen_data.keys())
     assignment = deepcopy(possible_draws)
-    
+    valid = False
+
     while not valid:
         random.shuffle(assignment)
         this_valid = True
-        
+
         for person_number in range(len(people)):
             person_id = people[person_number]
             assigned_person_id = assignment[person_number]
             identity_test = person_id == assigned_person_id
-            spouse_test = family_data[str(person_id)]['spouse'] == family_data[str(assigned_person_id)]['name']
-            
+            spouse_test = family_data[person_id]['spouse'] == family_data[assigned_person_id]['name']
+
             if identity_test or spouse_test:
                 this_valid = False
                 break
-            
+
         valid = this_valid
-    
-    output = {}
-    for i in range(len(assignment)):
-        output[people[i]] = assignment[i]
-    
+
+    output = {people[i]: assignment[i] for i in range(len(assignment))}
     return output
 
-family_data_path = os.path.join(DATA_PATH, "family_data_encrypted")
-pool_files_paths = [
-    os.path.join(DATA_PATH, "choosing_encrypted"),
-    os.path.join(DATA_PATH, "chosen_encrypted")
-]
-assignment_path = os.path.join(DATA_PATH, "assignment_encrypted")
 
-# Przykład wywołania losowania
-main_draw("1", family_data_path, pool_files_paths, assignment_path)
-print()
-# Przykład wielokrotnego wywołania losowania
-for i in range(10):
-    main_draw(str(i), family_data_path, pool_files_paths, assignment_path)
-    print()
+# family_data_path = os.path.join(DATA_PATH, "family_data_encrypted")
+# pool_files_paths = [
+#     os.path.join(DATA_PATH, "choosing_encrypted"),
+#     os.path.join(DATA_PATH, "chosen_encrypted")
+# ]
+# assignment_path = os.path.join(DATA_PATH, "assignment_encrypted")
+
+# # Przykład wywołania losowania
+# main_draw("1", family_data_path, pool_files_paths, assignment_path)
+# print()
+# # Przykład wielokrotnego wywołania losowania
+# for i in range(10):
+#     main_draw(str(i), family_data_path, pool_files_paths, assignment_path)
+#     print()

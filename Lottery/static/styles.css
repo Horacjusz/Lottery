@@ -108,10 +108,147 @@ body {
 }
 
 
+/* Stylizacja kontenera dla strony potwierdzenia hasła */
+.verify-password-container {
+    max-width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin: 0 auto;
+}
+
+.verify-password-container h2 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.verify-password-container label {
+    display: block;
+    margin: 15px 0 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.verify-password-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-top: 5px;
+}
+
+.verify-password-container button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.verify-password-container button:hover {
+    background-color: #45a049;
+}
+
+.verify-password-container a.back-link {
+    display: block;
+    margin-top: 15px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.verify-password-container a.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Dodatkowy styl dla błędów */
+.error-message {
+    color: red;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+.error {
+    border-color: red;
+}
 
 
 
 
+
+
+.register-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+.register-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.register-container label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.register-container input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.register-container button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.register-container button:hover {
+    background-color: #45a049;
+}
+
+.register-container a {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.register-container a:hover {
+    text-decoration: underline;
+}
+
+.register-container select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
 
 
 
@@ -164,6 +301,15 @@ body {
     white-space: normal;
 }
 
+.item-owner {
+    display: block;
+    font-size: 10px;
+    color: #000000; /* Szary kolor dla opisu */
+    margin-top: 4px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
 /* Stylizacja ikon edytowania i zapisywania */
 .edit-icon, .save-icon, .remove-icon {
     cursor: pointer;
@@ -197,18 +343,62 @@ body {
 }
 
 
+/* Style for the accept button in wishlist tables */
+.accept-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.accept-button:hover {
+    background-color: #45a049;
+}
 
 
 
 
 
 
+.wishlist-table td:nth-child(4) {
+    width: 7.5%;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.approve-icon {
+    cursor: pointer;
+    color: green;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.approve-icon:hover {
+    color: darkgreen;
+}
 
 
+.approved {
+    background-color: lightgreen !important;
+}
 
 
+.reserved-icon {
+    color: red; /* Makes the cross icon red */
+}
 
-
+/* Add a style for reserved rows */
+.reserved-item {
+    background-color: lightgreen;
+}
 
 
 
@@ -255,6 +445,13 @@ body {
 
 
 
+.user-wishlist-section {
+    margin-bottom: 30px; /* Zwiększenie odstępu między użytkownikami */
+}
+
+.user-wishlist-section h3 {
+    margin-bottom: 10px; /* Margines pod nazwą użytkownika */
+}
 
 
 

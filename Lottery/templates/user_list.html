@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Użytkowników</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .approved-row {
+            background-color: lightgreen;
+        }
+        .reserved-item {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h2>Lista Użytkowników</h2>
+        <a href="{{ url_for('dashboard') }}" class="dashboard-link">Powrót do Panelu</a>
+
+        <div class="section">
+            {% for user in users %}
+                <div class="user-wishlist-section {% if loop.index == 1 %}highlighted-user{% endif %}">
+                    <h3>{{ user.name }}</h3>
+                    {% if user.wishlist %}
+                        <table class="wishlist-table">
+                            <tbody>
+                                {% for item in user.wishlist %}
+                                <tr data-item="{{ item.name }} - {{ item.description }}"
+                                    class="{% if item.reserved_by == current_user_id %}reserved-item{% endif %}">
+                                    <td>
+                                        <span class="item-name">{{ item.name }}</span>
+                                        <span class="item-description">{{ item.description }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="approve-icon {% if item.reserved_by == current_user_id %}reserved-icon{% endif %}" 
+                                            onclick="reserveItem(event, '{{ user.username }}', '{{ item.name|escape }}', '{{ item.description|escape }}')">
+                                            {% if item.reserved_by == current_user_id %}×{% else %}✔{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                
+                                
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Nic tu jeszcze nie ma</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function reserveItem(event, username, itemName, itemDescription) {
+            const iconElement = event.target;
+            const row = iconElement.closest("tr");
+            
+            fetch("{{ url_for('reserve_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    item_name: itemName,
+                    item_description: itemDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle the row and icon immediately
+                    row.classList.toggle("reserved-item");
+                    if (iconElement.classList.contains("reserved-icon")) {
+                        iconElement.classList.remove("reserved-icon");
+                        iconElement.textContent = "✔"; // Change to check mark
+                    } else {
+                        iconElement.classList.add("reserved-icon");
+                        iconElement.textContent = "×"; // Change to cross mark
+                    }
+                } else {
+                    alert(data.error || "Error reserving item.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error processing reservation request.");
+            });
+        }
+
+    </script>
+</body>
+</html>
