@@ -114,7 +114,7 @@
         function acceptItem(event, username, itemName, itemDescription) {
             const iconElement = event.target;
             const row = iconElement.closest("tr");
-
+            
             fetch("{{ url_for('user.reserve_wishlist_item') }}", {
                 method: "POST",
                 headers: {
@@ -129,15 +129,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Toggle row and icon state immediately
+                    // Toggle the row and icon immediately
                     row.classList.toggle("reserved-item");
-                    
-                    if (iconElement.textContent === "✔") {
-                        iconElement.textContent = "×"; // Change to cross mark
-                        iconElement.classList.add("reserved-icon");
-                    } else {
-                        iconElement.textContent = "✔"; // Change to check mark
+                    if (iconElement.classList.contains("reserved-icon")) {
                         iconElement.classList.remove("reserved-icon");
+                        iconElement.textContent = "✔"; // Change to check mark
+                    } else {
+                        iconElement.classList.add("reserved-icon");
+                        iconElement.textContent = "×"; // Change to cross mark
                     }
                 } else {
                     alert(data.error || "Error reserving item.");
@@ -148,6 +147,7 @@
                 alert("Error processing reservation request.");
             });
         }
+
 
     
     function startDraw() {
