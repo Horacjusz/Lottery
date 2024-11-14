@@ -86,23 +86,19 @@ def edit_user():
 
 @user_blueprint.route("/user_list")
 def user_list():
-    users_data = decrypt_file(USERS_DATA_FILE)
+    users_data = decrypt_data()
     username = session.get("username")
-    current_user_id = None
+    current_user_id = session["user_id"]
 
-    # Find the current user's ID
-    for user_id, user_data in users_data.items():
-        if user_data["username"] == username:
-            current_user_id = user_id
-            break
+
 
     users_with_wishlists = []
     for user_id, user_data in users_data.items():
         # Skip the current user's own wishlist
-        if user_id == current_user_id:
+        if user_id == current_user_id or user_id == users_data[current_user_id].assignment:
             continue
         
-        print(users_data[current_user_id])
+        # print(users_data[current_user_id])
 
         # Filter items based on reservation visibility for the current user
         visible_wishlist = [
@@ -111,15 +107,15 @@ def user_list():
                 "description": item["description"],
                 "reserved_by": item.get("reserved_by")
             }
-            for item in user_data.get("wishlist", [])
+            for item in user_data.wishlist
             if item.get("reserved_by") is None or item["reserved_by"] == current_user_id
         ]
 
         # Only include users who have items in their visible wishlist
         if visible_wishlist:
             users_with_wishlists.append({
-                "username": user_data["username"],
-                "name": user_data["name"],
+                "username": user_data.username,
+                "name": user_data.name,
                 "wishlist": visible_wishlist
             })
 

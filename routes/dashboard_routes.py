@@ -36,7 +36,7 @@ def dashboard():
         }
         for owner_id, data in users_data.items()
         if owner_id != user_id
-        and owner_id != users_data[user_id].assignment  # Exclude assigned user's items
+        # and owner_id != users_data[user_id].assignment  # Exclude assigned user's items
         for item in data.wishlist
         if item["reserved_by"] == user_id
     ]
