@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ 'Edycja danych użytkownika' if user_data else 'Rejestracja' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+</head>
+<body>
+    <div class="register-container">
+        <h2>{{ 'Edycja danych użytkownika' if user_data else 'Rejestracja' }}</h2>
+        <form action="{{ url_for('user.edit_user' if edit_mode else 'auth.register') }}" method="POST">
+            <!-- Username field -->
+            <label for="username">Nazwa użytkownika</label>
+            <input type="text" id="username" name="username" value="{{ user_data.username if edit_mode else '' }}" required {% if username_exists %}class="error"{% endif %}>
+
+            {% if error_message %}
+                <p class="error-message">{{ error_message }}</p>
+            {% endif %}
+
+            <!-- Name input field -->
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" value="{{ user_data.name if edit_mode else '' }}" required>
+        
+            <!-- Spouse dropdown -->
+            <label for="spouse">Spouse</label>
+            <select name="spouse" id="spouse">
+                <option value="None" {% if user_data.spouse is none %}selected{% endif %}>No spouse</option>
+                {% for spouse in available_spouses %}
+                    <option value="{{ spouse.id }}" {% if user_data.spouse == spouse.id %}selected{% endif %}>
+                        {{ spouse.name }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Choosable checkbox -->
+            <label for="choosable">Weź udział w losowaniu:</label>
+            <input type="checkbox" id="choosable" name="choosable" {% if user_data.choosable %}checked{% endif %}>
+
+            <!-- Password handling -->
+            <label for="password">{% if edit_mode %}Wpisz hasło (to też okazja, żeby je zmienić):{% else %}Hasło:{% endif %}</label>
+            <input type="password" id="password" name="password">
+        
+            <label for="confirm_password">Potwierdź hasło:</label>
+            <input type="password" id="confirm_password" name="confirm_password">
+
+            {% if error_message_password %}
+            <p class="error-message">{{ error_message_password }}</p>
+            {% endif %}
+
+            <button type="submit">{{ 'Zapisz zmiany' if edit_mode else 'Zarejestruj' }}</button>
+        </form>
+        
+        {% if edit_mode %}
+            <a href="{{ url_for('dashboard.dashboard') }}" class="return-link">Wróć do panelu</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="return-link">Wróć do logowania</a>
+        {% endif %}
+    </div>
+    <script>
+        function validatePasswords() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm_password").value;
+
+            if (password && password !== confirmPassword) {
+                document.getElementById("error").textContent = "Hasła nie są identyczne. Spróbuj ponownie.";
+                return false; // Prevent form submission
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

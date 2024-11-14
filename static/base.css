@@ -1,0 +1,276 @@
+/* === RESET STYLÓW PRZEGLĄDARKI === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* === GŁÓWNY LAYOUT STRONY === */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+/* === KONTENERY DLA LOGOWANIA, REJESTRACJI I PANELU UŻYTKOWNIKA === */
+.login-container, .dashboard-container, .register-container, .verify-password-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* === NAGŁÓWKI === */
+.login-container h2, .dashboard-container h2, .register-container h2, .verify-password-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* === POLA WEJŚCIOWE I PRZYCISKI === */
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* === STYLIZACJA STRON LOGOWANIA, REJESTRACJI, WERYFIKACJI HASŁA === */
+label {
+    display: block;
+    margin-top: 15px;
+    color: #555;
+    font-size: 14px;
+}
+
+a.back-link {
+    display: block;
+    margin-top: 15px;
+    color: #007BFF;
+    text-decoration: none;
+}
+
+a.back-link:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+.error {
+    border-color: red;
+}
+
+/* === PANEL UŻYTKOWNIKA === */
+.dashboard-container .section {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.dashboard-container .section h3 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.dashboard-link {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    color: #fff;
+    background-color: #4CAF50;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+}
+
+.dashboard-link.logout {
+    background-color: #d9534f;
+}
+
+.dashboard-link:hover {
+    background-color: #45a049;
+}
+
+.dashboard-link.logout:hover {
+    background-color: #c9302c;
+}
+
+/* === TABELA ŻYCZEŃ === */
+.wishlist-table {
+    table-layout: fixed;
+    width: 100%;
+    max-width: 600px;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.wishlist-table td {
+    padding: 8px;
+    border: 1px solid #000;
+    vertical-align: top;
+}
+
+.wishlist-table td:first-child {
+    width: 85%;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.wishlist-table td:nth-child(2),
+.wishlist-table td:nth-child(3),
+.wishlist-table td:nth-child(4) {
+    width: 7.5%;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.item-description {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.item-owner {
+    font-size: 10px;
+    color: #000;
+    margin-top: 4px;
+}
+
+/* === IKONY EDYTOWANIA, ZAPISYWANIA, USUWANIA === */
+.edit-icon, .save-icon, .remove-icon {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.save-icon, .edit-icon {
+    color: #4CAF50;
+}
+
+.save-icon:hover, .edit-icon:hover {
+    color: #45a049;
+}
+
+.remove-icon {
+    color: #d9534f;
+}
+
+.remove-icon:hover {
+    color: #c9302c;
+}
+
+.accept-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.accept-button:hover {
+    background-color: #45a049;
+}
+
+.approve-icon {
+    cursor: pointer;
+    color: green;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.approve-icon:hover {
+    color: darkgreen;
+}
+
+.reserved-item {
+    background-color: lightgreen;
+}
+
+/* === FORMULARZ DODAWANIA ŻYCZEŃ === */
+#wishlist-form {
+    margin-top: 20px;
+}
+
+#wishlist-form h4 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#wishlist-form input[type="text"] {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#wishlist-form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* === SEKSCJA ŻYCZEŃ UŻYTKOWNIKA === */
+.user-wishlist-section {
+    margin-bottom: 30px;
+}
+
+.user-wishlist-section h3 {
+    margin-bottom: 10px;
+}
+
+/* === STYLIZACJA DLA RESPONSYWNOŚCI === */
+@media (max-width: 480px) {
+    .login-container, .dashboard-container {
+        padding: 15px;
+    }
+
+    .login-container h2, .dashboard-container h2 {
+        font-size: 1.5em;
+    }
+
+    input, button {
+        font-size: 1em;
+    }
+}
