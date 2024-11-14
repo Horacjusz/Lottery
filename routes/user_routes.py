@@ -178,24 +178,33 @@ def edit_wishlist_item():
         return jsonify({"error": "Musisz być zalogowany, aby wykonać tę operację."}), 403
 
     username = session["username"]
+    user_id = session["user_id"]
     data = request.json
+    print(data)
     original_name = data.get("original_name")
     original_description = data.get("original_description")
     new_name = data.get("new_name")
     new_description = data.get("new_description")
 
-    users_data = decrypt_file(USERS_DATA_FILE)
-    if username in users_data and "wishlist" in users_data[username]:
-        wishlist = users_data[username]["wishlist"]
-
+    print(original_name, original_description)
+    print(new_name, new_description)
+    
+    users_data = decrypt_data()
+    if user_id in users_data :
+        wishlist = users_data[user_id].wishlist
         # Find and update the item based on both name and description
-        for i, (name, desc) in enumerate(wishlist):
-            if name == original_name and desc == original_description:
-                wishlist[i] = (new_name, new_description)
+        for i in range(len(wishlist)) :
+            item = wishlist[i]
+            print(item)
+            if item["name"] == original_name and item["description"] == original_description :
+                item["name"] = new_name
+                item["description"] = new_description
+                wishlist[i] = item
                 break
-
+        from services.data_service import data_to_dict
         # Save updated data
-        encrypted_data = json.dumps(users_data, ensure_ascii=False, indent=4)
+        users_data[user_id].wishlist = wishlist
+        encrypted_data = json.dumps(data_to_dict(users_data), ensure_ascii=False, indent=4)
         encrypt_file(encrypted_data, USERS_DATA_FILE)
         return jsonify({"success": True}), 200
 
