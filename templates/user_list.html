@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista Użytkowników</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-    <style>
-        .approved-row {
-            background-color: lightgreen;
-        }
-        .reserved-item {
-            background-color: lightgreen;
-        }
-    </style>
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="dashboard-container-user-list">
+        
         <h2>Lista Użytkowników</h2>
-        <a href="{{ url_for('dashboard.dashboard') }}" class="dashboard-link">Powrót do Panelu</a>
+        <div class="bottom-tab">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="dashboard-link-static">Powrót do Panelu</a>
+        </div>
 
         <div class="section">
             {% for user in users %}
@@ -52,6 +47,7 @@
             {% endfor %}
         </div>
     </div>
+    
 
     <script>
         function reserveItem(event, username, itemName, itemDescription) {
@@ -74,11 +70,15 @@
                 if (data.success) {
                     // Toggle the row and icon immediately
                     row.classList.toggle("reserved-item");
-                    if (iconElement.classList.contains("reserved-icon")) {
-                        iconElement.classList.remove("reserved-icon");
+                    if (iconElement.classList.contains("reserved-item")) {
+                        iconElement.classList.remove("reserved-item");
+                        iconElement.classList.remove("remove-icon");
+                        iconElement.classList.add("approve-icon");
                         iconElement.textContent = "✔"; // Change to check mark
                     } else {
-                        iconElement.classList.add("reserved-icon");
+                        iconElement.classList.add("reserved-item");
+                        iconElement.classList.add("remove-icon");
+                        iconElement.classList.remove("approve-icon");
                         iconElement.textContent = "×"; // Change to cross mark
                     }
                 } else {

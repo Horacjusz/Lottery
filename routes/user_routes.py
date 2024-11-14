@@ -180,14 +180,11 @@ def edit_wishlist_item():
     username = session["username"]
     user_id = session["user_id"]
     data = request.json
-    print(data)
     original_name = data.get("original_name")
     original_description = data.get("original_description")
     new_name = data.get("new_name")
     new_description = data.get("new_description")
 
-    print(original_name, original_description)
-    print(new_name, new_description)
     
     users_data = decrypt_data()
     if user_id in users_data :
@@ -195,7 +192,6 @@ def edit_wishlist_item():
         # Find and update the item based on both name and description
         for i in range(len(wishlist)) :
             item = wishlist[i]
-            print(item)
             if item["name"] == original_name and item["description"] == original_description :
                 item["name"] = new_name
                 item["description"] = new_description

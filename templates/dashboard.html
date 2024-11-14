@@ -19,25 +19,29 @@
                 <div class="assigned-user-info">
                     <p>Wylosowałeś: <strong>{{ assigned_user.name }}</strong></p>
                     <h4>Lista życzeń:</h4>
+                    
+                    {% set unreserved_items = assigned_user.wishlist | selectattr("reserved_by", "equalto", none) | list %}
+                    
                     <table class="wishlist-table" id="assigned-user-wishlist">
                         <tbody>
-                            {% for item in assigned_user.wishlist %}
-                                <tr class="{% if item.reserved_by == user_id %}reserved-item{% endif %}" data-item="{{ item.name }} - {{ item.description }}">
+                            {% for item in unreserved_items %}
+                                <tr data-item="{{ item.name }} - {{ item.description }}">
                                     <td>
                                         <span class="item-name">{{ item.name }}</span>
                                         <span class="item-description">{{ item.description }}</span>
                                     </td>
                                     <td>
-                                            <span class="approve-icon" onclick="acceptItem(event, '{{ assigned_user.username }}', '{{ item.name|escape }}', '{{ item.description|escape }}')">
-                                                {% if item.reserved_by == user_id %}×{% else %}✔{% endif %}
-                                            </span>
+                                        <span class="approve-icon" onclick="acceptItem(event, '{{ assigned_user.username }}', '{{ assigned_user.name }}', '{{ item.name|escape }}', '{{ item.description|escape }}')">✔</span>
                                     </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    </table>
+                    
+                    <!-- Placeholder for Empty message, hidden by default -->
+                    <p id="empty-message" style="display: none;">Nic tu nie ma ¯\\_(ツ)_/¯</p>
                 </div>
+                
             {% elif not user_data.choosable %}
                 <!-- If choosable is False and assignment is None, display a message -->
                 <p>Ty nie losujesz</p>
@@ -60,7 +64,7 @@
                                 <span class="item-description">{{ item.description }}</span>
                                 <span class="item-owner">{{ item.owner_name }}</span>
                             </td>
-                            <td><span class="remove-icon" onclick="unreserveItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}', '{{ item.owner_username|escape }}')">×</span></td>
+                            <td><span class="remove-icon" onclick="unreserveItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}', '{{ item.owner_username|escape }}', '{{ item.owner_name|escape }}')">×</span></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -74,7 +78,7 @@
 
         <div class="section">
             <h3>Twoja lista życzeń:</h3>
-            <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
+            <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}> tu jeszcze nie ma</p>
             <table class="wishlist-table" id="wishlist-table">
                 <tbody>
                     {% for item in wishlist %}
@@ -111,10 +115,53 @@
     </div>
 
     <script>
-        function acceptItem(event, username, itemName, itemDescription) {
+        function checkUnreservedItems() {
+            const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
+            const emptyMessage = document.querySelector(".assigned-user-info p.empty-message");
+    
+            if (wishlistTableBody.children.length === 0) {
+                if (!emptyMessage) {
+                    const message = document.createElement("p");
+                    message.classList.add("empty-message");
+                    message.innerText = "Nic tu nie ma ¯\\_(ツ)_/¯";
+                    document.querySelector(".assigned-user-info").appendChild(message);
+                }
+            } else if (emptyMessage) {
+                emptyMessage.remove();
+            }
+        }
+    
+        function acceptItem(event, username, name, itemName, itemDescription) {
             const iconElement = event.target;
             const row = iconElement.closest("tr");
-            
+            const reservedTableBody = document.querySelector("#reserved-table tbody");
+    
+            // Instantly remove the item row from the assigned user's wishlist table
+            row.remove();
+            checkUnreservedItems(); // Check if "Empty" message should be displayed
+    
+            // Hide "No reserved items" message if it is currently displayed
+            const noReservedItemsMessage = document.getElementById("no-reserved-items");
+            if (noReservedItemsMessage) {
+                noReservedItemsMessage.style.display = "none";
+            }
+    
+            // Add the item to the reserved items section with the display name (name) instead of username
+            const newRow = document.createElement("tr");
+            newRow.classList.add("reserved-item");
+            newRow.setAttribute("data-item", `${itemName} - ${itemDescription}`);
+    
+            newRow.innerHTML = `
+                <td>
+                    <span class="item-name">${itemName}</span>
+                    <span class="item-description">${itemDescription}</span>
+                    <span class="item-owner">${name}</span> <!-- Use display name -->
+                </td>
+                <td><span class="remove-icon" onclick="unreserveItem(event, '${itemName}', '${itemDescription}', '${username}', '${name}')">×</span></td>
+            `;
+            reservedTableBody.appendChild(newRow);
+    
+            // Send request to reserve item on the server
             fetch("{{ url_for('user.reserve_wishlist_item') }}", {
                 method: "POST",
                 headers: {
@@ -128,118 +175,147 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // Toggle the row and icon immediately
-                    row.classList.toggle("reserved-item");
-                    if (iconElement.classList.contains("reserved-icon")) {
-                        iconElement.classList.remove("reserved-icon");
-                        iconElement.textContent = "✔"; // Change to check mark
-                    } else {
-                        iconElement.classList.add("reserved-icon");
-                        iconElement.textContent = "×"; // Change to cross mark
-                    }
-                } else {
+                if (!data.success) {
                     alert(data.error || "Error reserving item.");
+                    const wishlistTable = document.querySelector("#assigned-user-wishlist tbody");
+                    wishlistTable.appendChild(row); // Add back the row if there was an error
+                    checkUnreservedItems(); // Recheck "Empty" message
                 }
             })
             .catch(error => {
                 console.error("Error:", error);
                 alert("Error processing reservation request.");
+                const wishlistTable = document.querySelector("#assigned-user-wishlist tbody");
+                wishlistTable.appendChild(row); // Re-add the row in case of error
+                checkUnreservedItems(); // Recheck "Empty" message
             });
         }
-
-
     
-    function startDraw() {
-        fetch("{{ url_for('draw.start_draw') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+        function unreserveItem(event, itemName, itemDescription, ownerUserName, ownerName) {
+            const reservedRow = event.target.closest("tr");
+            const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
+            const noReservedItemsMessage = document.getElementById("no-reserved-items");
+    
+            // Instantly remove the item from the reserved items table
+            reservedRow.remove();
+    
+            // If no reserved items remain, show the "No reserved items" message
+            if (!document.querySelector("#reserved-table tbody tr")) {
+                noReservedItemsMessage.style.display = "block";
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const drawResultDiv = document.getElementById("draw-result");
-            if (data.success) {
-                drawResultDiv.innerHTML = `
-                    <p>Wylosowałeś: <strong>${data.name}</strong></p>
-                    <h4>Lista życzeń:</h4>
-                    <table class="wishlist-table">
-                        <tbody>
-                            ${data.wishlist.map(item => `
-                                <tr>
-                                    <td>
-                                        <span class="item-name">${item.name}</span> - 
-                                        <span class="item-description">${item.description}</span>
-                                    </td>
-                                    <td>
-                                        <span class="approve-icon" data-username="${data.name}" 
-                                            data-item-name="${item.name}" 
-                                            data-item-description="${item.description}">✔</span>
-                                    </td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                `;
-
-                // Hide draw button after successful draw
-                document.getElementById("draw-button").style.display = "none";
-
-                // Attach event listeners to each approve-icon
-                document.querySelectorAll(".approve-icon").forEach(icon => {
-                    icon.addEventListener("click", function(event) {
-                        const username = data.username
-                        const itemName = this.getAttribute("data-item-name");
-                        const itemDescription = this.getAttribute("data-item-description");
-                        acceptItem(event, username, itemName, itemDescription);
-                    });
-                });
-            } else {
-                drawResultDiv.innerHTML = `<p>${data.error || "Wystąpił błąd podczas losowania."}</p>`;
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            document.getElementById("draw-result").innerHTML = "<p>Wystąpił błąd podczas losowania.</p>";
-        });
-    }
-        // Function to unreserve an item and update the reserved items section
-        function unreserveItem(event, itemName, itemDescription, ownerName) {
-            const itemRow = document.querySelector(`tr[data-item="${itemName} - ${itemDescription}"]`);
-
+    
+            // Add the item back to the top of the assigned user's wishlist
+            const newWishlistRow = document.createElement("tr");
+            newWishlistRow.setAttribute("data-item", `${itemName} - ${itemDescription}`);
+            
+            newWishlistRow.innerHTML = `
+                <td>
+                    <span class="item-name">${itemName}</span>
+                    <span class="item-description">${itemDescription}</span>
+                </td>
+                <td>
+                    <span class="approve-icon" onclick="acceptItem(event, '${ownerUserName}', '${ownerName}', '${itemName}', '${itemDescription}')">✔</span>
+                </td>
+            `;
+            wishlistTableBody.prepend(newWishlistRow);
+            checkUnreservedItems(); // Check if "Empty" message should be displayed
+    
+            // Send request to unreserve the item on the server
             fetch("{{ url_for('user.reserve_wishlist_item') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    username: ownerName,
+                    username: ownerUserName,
                     item_name: itemName,
                     item_description: itemDescription
                 })
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // Remove the item row immediately
-                    if (itemRow) {
-                        itemRow.remove();
-                    }
-
-                    // Check if any items are left in the reserved table and toggle the message visibility
-                    const reservedTableBody = document.querySelector("#reserved-table tbody");
-                    const noReservedItemsMessage = document.getElementById("no-reserved-items");
-
-                    if (!reservedTableBody.querySelector("tr")) {
-                        noReservedItemsMessage.style.display = "block";  // Show message if no items remain
+                if (!data.success) {
+                    alert(data.error || "Error unreserving item.");
+                    document.querySelector("#reserved-table tbody").appendChild(reservedRow); // Re-add item in case of error
+                    if (noReservedItemsMessage) {
+                        noReservedItemsMessage.style.display = "none"; // Hide "No reserved items" message again
                     }
                 }
             })
             .catch(error => {
-                console.error("Error:", error);  // Log error silently
+                console.error("Error:", error);
+                alert("Error processing unreserve request.");
+                document.querySelector("#reserved-table tbody").appendChild(reservedRow); // Re-add item in case of error
+                if (noReservedItemsMessage) {
+                    noReservedItemsMessage.style.display = "none";
+                }
             });
         }
+    
+        // Run checkUnreservedItems on page load to set the initial state of "Empty" message
+        document.addEventListener("DOMContentLoaded", checkUnreservedItems);
+
+
+
+    
+        function startDraw() {
+            fetch("{{ url_for('draw.start_draw') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const drawResultDiv = document.getElementById("draw-result");
+                if (data.success) {
+                    drawResultDiv.innerHTML = `
+                        <p>Wylosowałeś: <strong>${data.name}</strong></p>
+                        <h4>Lista życzeń:</h4>
+                        <table class="wishlist-table">
+                            <tbody>
+                                ${data.wishlist.map(item => `
+                                    <tr>
+                                        <td>
+                                            <span class="item-name">${item.name}</span> - 
+                                            <span class="item-description">${item.description}</span>
+                                        </td>
+                                        <td>
+                                            <span class="approve-icon" data-username="${data.name}" 
+                                                data-item-name="${item.name}" 
+                                                data-item-description="${item.description}">✔</span>
+                                        </td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    `;
+
+                    // Hide draw button after successful draw
+                    document.getElementById("draw-button").style.display = "none";
+
+                    // Attach event listeners to each approve-icon
+                    document.querySelectorAll(".approve-icon").forEach(icon => {
+                        icon.addEventListener("click", function(event) {
+                            const username = data.username
+                            const name = data.name
+                            const itemName = this.getAttribute("data-item-name");
+                            const itemDescription = this.getAttribute("data-item-description");
+                            acceptItem(event, username, name, itemName, itemDescription);
+                        });
+                    });
+                } else {
+                    drawResultDiv.innerHTML = `<p>${data.error || "Wystąpił błąd podczas losowania."}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("draw-result").innerHTML = "<p>Wystąpił błąd podczas losowania.</p>";
+            });
+        }
+
+
+        
     
 
         function editItem(event, itemName, itemDescription) {
