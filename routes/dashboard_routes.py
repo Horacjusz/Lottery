@@ -12,7 +12,7 @@ dashboard_blueprint = Blueprint("dashboard", __name__)
 def dashboard():
     if "username" not in session:
         flash("Musisz być zalogowany, aby zobaczyć tę stronę.", "error")
-        return redirect(url_for("login"))
+        return redirect(url_for("auth.login"))
 
     username = session["username"]
     users_data = decrypt_data()
@@ -21,7 +21,7 @@ def dashboard():
 
     if user_data is None:
         flash("Nie znaleziono danych użytkownika. Proszę spróbować ponownie.", "error")
-        return redirect(url_for("logout"))
+        return redirect(url_for("auth.logout"))
 
     # User's wishlist for the dashboard
     wishlist = user_data.wishlist
@@ -41,7 +41,7 @@ def dashboard():
         if item["reserved_by"] == user_id
     ]
     
-    assigned_user = users_data[user_data.assignment]
+    assigned_user = users_data[user_data.assignment] if user_data.assignment is not None else None
 
     # print(users_data[user_data.assignment])
     

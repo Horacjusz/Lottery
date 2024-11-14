@@ -134,6 +134,7 @@ def register():
 @auth_blueprint.route("/logout")
 def logout():
     session.pop("username", None)
+    session.pop("user_id", None)
     flash("Wylogowano pomyślnie!", "success")
     return redirect(url_for("auth.login"))
 
