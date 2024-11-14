@@ -1,1 +1,1 @@
-web: python Lottery/app.py
+web: python app.py
