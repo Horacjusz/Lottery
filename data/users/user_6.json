@@ -1,6 +1,6 @@
 {
     "user_ID": 6,
-    "name": "Jeremy Jones",
+    "name": "Victor Phelps",
     "username": "user_6",
     "password": "test",
     "visible": true,
@@ -10,7 +10,9 @@
     "assigned_to": null,
     "admin": false,
     "wishlist": [
-        9
+        12,
+        13,
+        14
     ],
     "reserved_items": []
 }

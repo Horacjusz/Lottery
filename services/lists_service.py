@@ -22,4 +22,5 @@ def get_all_items() :
     items = {}
     for ID in ids :
         items[ID] = (load_item_file(ID))
+        print(items[ID])
     return items

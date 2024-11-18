@@ -1,6 +1,6 @@
 {
     "user_ID": 7,
-    "name": "Billy Chavez",
+    "name": "Laura Patterson",
     "username": "user_7",
     "password": "test",
     "visible": true,
@@ -9,6 +9,8 @@
     "assignment": null,
     "assigned_to": null,
     "admin": false,
-    "wishlist": [],
+    "wishlist": [
+        15
+    ],
     "reserved_items": []
 }

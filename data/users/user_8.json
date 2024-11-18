@@ -1,6 +1,6 @@
 {
     "user_ID": 8,
-    "name": "Kevin Fuentes",
+    "name": "Lauren Nicholson",
     "username": "user_8",
     "password": "test",
     "visible": true,
@@ -10,8 +10,11 @@
     "assigned_to": null,
     "admin": false,
     "wishlist": [
-        10,
-        11
+        16,
+        17,
+        18,
+        19,
+        20
     ],
     "reserved_items": []
 }

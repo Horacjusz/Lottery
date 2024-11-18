@@ -1,6 +1,6 @@
 {
     "user_ID": 5,
-    "name": "Trevor Jacobson",
+    "name": "Whitney Cunningham",
     "username": "user_5",
     "password": "test",
     "visible": true,
@@ -11,7 +11,10 @@
     "admin": false,
     "wishlist": [
         7,
-        8
+        8,
+        9,
+        10,
+        11
     ],
     "reserved_items": []
 }

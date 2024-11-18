@@ -1,6 +1,6 @@
 {
     "user_ID": 1,
-    "name": "Marc Goodman",
+    "name": "John Smith",
     "username": "user_1",
     "password": "test",
     "visible": true,
@@ -9,10 +9,6 @@
     "assignment": null,
     "assigned_to": null,
     "admin": false,
-    "wishlist": [
-        1,
-        2,
-        3
-    ],
+    "wishlist": [],
     "reserved_items": []
 }

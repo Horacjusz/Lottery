@@ -1,6 +1,6 @@
 {
     "user_ID": 3,
-    "name": "Mr. Keith Ramos",
+    "name": "Edwin Alexander",
     "username": "user_3",
     "password": "test",
     "visible": true,
@@ -9,8 +9,6 @@
     "assignment": null,
     "assigned_to": null,
     "admin": false,
-    "wishlist": [
-        5
-    ],
+    "wishlist": [],
     "reserved_items": []
 }

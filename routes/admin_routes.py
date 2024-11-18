@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request
 from services.verification import is_visible
-from settings.settings import load_settings
+from settings.settings import load_settings, save_settings
 from services.lists_service import get_available_spouses, get_all_users, get_all_items
+from settings.tokens import *
 
 admin_blueprint = Blueprint("admin", __name__, template_folder="templates")
 
@@ -20,20 +21,33 @@ def admin_dashboard():
     
 @admin_blueprint.route("/admin.update_user")
 def update_user() :
+    print("updating")
     pass
 
-@admin_blueprint.route("/admin.toggle_lottery")
-def toggle_lottery() :
-    pass
+
+@admin_blueprint.route("/admin/toggle_lottery", methods=["POST"])
+def toggle_lottery():
+    print("Toggling lottery...")
+
+    settings = load_settings()  # Load current settings
+    settings["LOTTERY_ACTIVE"] = not settings["LOTTERY_ACTIVE"]  # Toggle the value
+    save_settings(settings)  # Save updated settings
+
+    return jsonify({"success": True, "LOTTERY_ACTIVE": settings["LOTTERY_ACTIVE"]})
+
 
 @admin_blueprint.route("/admin.unreserve_wishlist_item")
 def unreserve_wishlist_item() :
+    print("unreserving")
     pass
 
 @admin_blueprint.route("/admin.edit_wishlist_item")
 def edit_wishlist_item() :
+    print("editing")
     pass
 
 @admin_blueprint.route("/admin.remove_wishlist_item")
 def remove_wishlist_item() :
+    print("removing")
     pass
+

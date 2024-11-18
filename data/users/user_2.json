@@ -1,6 +1,6 @@
 {
     "user_ID": 2,
-    "name": "Eric Rodriguez",
+    "name": "Alison Zimmerman",
     "username": "user_2",
     "password": "test",
     "visible": true,
@@ -10,7 +10,10 @@
     "assigned_to": null,
     "admin": false,
     "wishlist": [
-        4
+        1,
+        2
     ],
-    "reserved_items": []
+    "reserved_items": [
+        9
+    ]
 }

@@ -21,8 +21,6 @@ def main_draw(user_id) :
         print("User", user_id, "does not participate in lottery")
         return None
     
-    
-    
     choosers = get_all_choosers()
     choosable = get_all_choosable()
     

@@ -21,10 +21,6 @@ if __name__ == "__main__":
     main_generate(n)
     
     reserve_item(2, 9)
-    print_user(2)
-    unreserve_item(9)
-    print_user(2)
-    
     
     # import time
     

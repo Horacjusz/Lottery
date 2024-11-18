@@ -286,7 +286,7 @@ a.back-link:hover {
 }
 
 .reserved-item {
-    background-color: lightgreen;
+    background-color: white;
 }
 
 /* === FORMULARZ DODAWANIA ŻYCZEŃ === */
@@ -402,6 +402,32 @@ a.back-link:hover {
     align-items: center;
     gap: 5px; /* Adjust spacing between label and checkbox if needed */
     margin: 0; /* Optional: to remove extra space around the element */
+}
+
+.reserved-button,
+.bought-button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: black;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+}
+
+.reserved-button:hover {
+    background-color: #ff9800;
+    color: white;
+}
+
+.bought-button:hover {
+    background-color: #4caf50;
+    color: white;
+}
+
+.reserved-green {
+    background-color: lightgreen;
 }
 
 

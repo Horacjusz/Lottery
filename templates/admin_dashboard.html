@@ -20,6 +20,7 @@
             background-color: rgb(255, 166, 0);
         }
     </style>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -30,15 +31,18 @@
             <div class="lottery-status">
                 <!-- <p>LOTTERY_ACTIVE:</p> -->
                 <button id="lottery-toggle-btn"
-                        class="lottery-btn {{ 'lottery-enabled' if settings.LOTTERY_ACTIVE else 'lottery-disabled' }}"
-                        onclick="toggleLotteryActive(event)">
+                    class="lottery-btn {{ 'lottery-enabled' if settings.LOTTERY_ACTIVE else 'lottery-disabled' }}"
+                    onclick="toggleLotteryActive(event)">
                     {{ 'Lottery enabled' if settings.LOTTERY_ACTIVE else 'Lottery disabled' }}
                 </button>
+                <p id="lottery-status">
+                    Current status: {{ 'Enabled' if settings.LOTTERY_ACTIVE else 'Disabled' }}
+                </p>
             </div>
         </div>
 
         <div class="users-section">
-            <p>User list</p>
+            <p><strong>User list</strong></p>
             <button class="collapsible main-collapsible">Show</button>
             <div class="users-list content">
                 <ul>
@@ -50,6 +54,22 @@
                                 <button class="collapsible user-collapsible">+</button>
                             </div>
                             <div class="content user-content"><p><strong>ID:</strong> {{ user_id }}</p>
+                                <p>
+                                    <strong>Assignment:</strong></strong>
+
+                                    <!-- Assignment Display -->
+                                    <p id="assignment-{{ user_id }}">
+                                        {{ user.assignment }}
+                                        {% if user.assignment is not none %}
+                                            -> {{ users_data[user.assignment].name }}
+                                        {% endif %}
+                                    </p>      
+
+                                    <!-- Draw Form -->
+                                    <form id="draw-form-{{ user_id }}" method="post" action="{{ url_for('draw.draw_assignment', user_id=user_id) }}">
+                                        <button type="button" onclick="submitDrawForm({{ user_id }})">Draw</button>
+                                    </form>            
+                                </p>
                                 <form method="post" action="{{ url_for('admin.update_user', user_id=user_id) }}">
                                     <p><strong>Name:</strong> {{ user.name }}</p>
                                     <p><strong>Username:</strong> {{ user.username }}</p>
@@ -74,66 +94,67 @@
                                                     {{ users_data[user.spouse].name }} - {{ user.spouse }}
                                                 </option>
                                             {% endif %}
-                                            {% for spouse in available_spouses %}
-                                                <option value="{{ spouse.id }}" 
-                                                    {% if user.spouse == spouse.id %}selected{% endif %}>
-                                                    {{ spouse.name }} - {{ spouse.id }}
-                                                </option>
+                                            {% for spouse_id in available_spouses %}
+                                                {% if spouse_id != user_id %}
+                                                    {% set spouse = users_data[spouse_id] %}
+                                                    <option value="{{ spouse.id }}" 
+                                                        {% if user.spouse == spouse.id %}selected{% endif %}>
+                                                        {{ spouse.name }} - {{ spouse.user_ID }}
+                                                    </option>
+                                                {% endif %}
                                             {% endfor %}
                                         </select>
                                     </p>
                                     <p>
-                                        <strong>Assignment:</strong></strong>
-                                        <select name="assignment" id="assignment">
-                                            <option value="None" {% if user.assignment is none %}selected{% endif %}>None</option>
-                                            {% if user.assignment is not none %}
-                                                <option value="{{ user.assignment }}" selected>
-                                                    {{ users_data[user.assignment].name }} - {{ user.assignment }}
-                                                </option>
-                                            {% endif %}
-                                            {% for assignment in available_assignments %}
-                                                <option value="{{ assignment }}">
-                                                    {{ users_data[assignment].name }} - {{ users_data[assignment].ID }}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </p>
-                                    <p>
-                                        <strong>Wishlist:</strong></strong>
+                                        <strong>Wishlist:</strong>
                                         <table class="wishlist-table" id="wishlist-table">
                                             <tbody>
                                                 {% for item_id in users_data[user_id].wishlist %}
                                                     {% set item = items_data[item_id] %}
-                                                    <tr data-item="{{ item.name }} - {{ item.description }}">
+                                                    <tr data-item-id="{{ item_id }}">
                                                         <td>
-                                                            <span class="item-name">{{ item.name }}</span>
-                                                            <span class="item-description">{{ item.description }}</span>
+                                                            <span class="item-name">{{ item.item_name }}</span>
+                                                            <span class="item-description">{{ item.item_description }}</span>
                                                         </td>
-                                                        <td><span class="edit-icon" onclick="editItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}', '{{ user_id }}')">✎</span></td>
-                                                        <td><span class="remove-icon" onclick="removeItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}', '{{ user_id }}')">×</span></td>
+                                                        <td>
+                                                            <span class="edit-icon" 
+                                                                  onclick="editItem(event, '{{ item_id }}', '{{ item.item_name|escape }}', '{{ item.item_description|escape }}')">✎</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="remove-icon" 
+                                                                  onclick="removeItem(event, {{ item_id }})">×</span>
+                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
                                         </table>
+                                        <p id="no-items" style="display: none;">No items in the wishlist.</p>
                                     </p>
                                     <p>
-                                        <strong>Reserved_items:</strong></strong>
+                                        <strong>Reserved Items:</strong>
                                         <table class="wishlist-table" id="reserved-table">
                                             <tbody>
                                                 {% for item_id in users_data[user_id].reserved_items %}
                                                     {% set item = items_data[item_id] %}
-                                                    <tr class="reserved-item" data-item="{{ item.name }} - {{ item.description }}">
+                                                    <tr class="reserved-item {% if item.bought %}reserved-green{% endif %}" data-item-id="{{ item_id }}">
                                                         <td>
                                                             <span class="item-name">{{ item.item_name }}</span>
                                                             <span class="item-description">{{ item.item_description }}</span>
                                                             <span class="item-owner">{{ item.owner_name }}</span>
                                                         </td>
-                                                        <td><span class="remove-icon" onclick="unreserveItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}', '{{ item.owner_username|escape }}', '{{ user_id }}')">×</span></td>
+                                                        <td>
+                                                            <span class="edit_icon" onclick="unreserveItem(event, '{{ item_id }}')">×</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="edit-icon" onclick="markItemBought(event, '{{ item_id }}')">💲</span>
+                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
                                         </table>
+                                        <p id="no-reserved-items" style="display: {% if users_data[user_id].reserved_items|length == 0 %}block{% else %}none{% endif %};">No reserved items available.</p>
                                     </p>
+                                    
                                     <p>
                                         <strong>Admin:</strong></strong>
                                         <input 
@@ -169,244 +190,5 @@
             <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>
         </div>
     </div>
-
-    <script>
-        function toggleLotteryActive(event) {
-            const toggleButton = event.target;
-        
-            // Optimistically toggle UI state
-            const isCurrentlyActive = toggleButton.classList.contains("lottery-enabled");
-            toggleButton.textContent = isCurrentlyActive ? "Lottery disabled" : "Lottery enabled";
-            toggleButton.classList.toggle("lottery-enabled", !isCurrentlyActive);
-            toggleButton.classList.toggle("lottery-disabled", isCurrentlyActive);
-        
-            // Send request to update LOTTERY_ACTIVE on the server
-            fetch("{{ url_for('admin.toggle_lottery') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ active: !isCurrentlyActive })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    // Revert UI state if the server update fails
-                    toggleButton.textContent = isCurrentlyActive ? "Lottery enabled" : "Lottery disabled";
-                    toggleButton.classList.toggle("lottery-enabled", isCurrentlyActive);
-                    toggleButton.classList.toggle("lottery-disabled", !isCurrentlyActive);
-                    alert(data.error || "Error toggling LOTTERY_ACTIVE.");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                // Revert UI state in case of a network or server error
-                toggleButton.textContent = isCurrentlyActive ? "Lottery enabled" : "Lottery disabled";
-                toggleButton.classList.toggle("lottery-enabled", isCurrentlyActive);
-                toggleButton.classList.toggle("lottery-disabled", !isCurrentlyActive);
-                alert("Error processing the request to toggle LOTTERY_ACTIVE.");
-            });
-        }
-    
-        
-        document.addEventListener("DOMContentLoaded", function() {
-            // Toggle for the main user list
-            const mainCollapsible = document.querySelector(".main-collapsible");
-            const userList = document.querySelector(".users-list");
-            mainCollapsible.addEventListener("click", function() {
-                this.classList.toggle("active");
-                userList.style.display = userList.style.display === "block" ? "none" : "block";
-                this.textContent = userList.style.display === "block" ? "Hide" : "Show";
-            });
-
-            // Toggle for individual user attributes
-            const userCollapsibles = document.querySelectorAll(".user-collapsible");
-            userCollapsibles.forEach(button => {
-                button.addEventListener("click", function() {
-                    const userContent = this.parentElement.nextElementSibling; // Correct sibling selection
-                    userContent.style.display = userContent.style.display === "block" ? "none" : "block";
-                    this.textContent = userContent.style.display === "block" ? "-" : "+";
-                });
-            });
-        });
-
-        
-        function checkUnreservedItems() {
-            const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
-            const emptyMessage = document.querySelector(".assigned-user-info p.empty-message");
-
-            // Check if the wishlist table exists before proceeding
-            if (!wishlistTableBody) return;
-
-            if (wishlistTableBody.children.length === 0) {
-                if (!emptyMessage) {
-                    const message = document.createElement("p");
-                    message.classList.add("empty-message");
-                    message.innerText = "Nic tu nie ma ¯\\_(ツ)_/¯";
-                    document.querySelector(".assigned-user-info").appendChild(message);
-                }
-            } else if (emptyMessage) {
-                emptyMessage.remove();
-            }
-        }
-        
-        
-        function unreserveItem(event, itemName, itemDescription, ownerUserName, ownerName, user_id) {
-            const reservedRow = event.target.closest("tr");
-            const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
-            const noReservedItemsMessage = document.getElementById("no-reserved-items");
-
-            // Instantly remove the item from the reserved items table
-            reservedRow.remove();
-
-            // If no reserved items remain, show the "No reserved items" message
-            if (!document.querySelector("#reserved-table tbody tr")) {
-                noReservedItemsMessage.style.display = "block";
-            }
-
-            // Add the item back to the assigned user's wishlist if the table exists
-            if (wishlistTableBody) {
-                const newWishlistRow = document.createElement("tr");
-                newWishlistRow.setAttribute("data-item", `${itemName} - ${itemDescription}`);
-
-                newWishlistRow.innerHTML = `
-                    <td>
-                        <span class="item-name">${itemName}</span>
-                        <span class="item-description">${itemDescription}</span>
-                    </td>
-                    <td>
-                        <span class="approve-icon" onclick="acceptItem(event, '${ownerUserName}', '${ownerName}', '${itemName}', '${itemDescription}')">✔</span>
-                    </td>
-                `;
-                wishlistTableBody.prepend(newWishlistRow);
-            }
-
-            checkUnreservedItems(); // Check if "Empty" message should be displayed
-
-            // Send request to unreserve the item on the server
-            fetch("{{ url_for('admin.unreserve_wishlist_item') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: ownerUserName,
-                    item_name: itemName,
-                    item_description: itemDescription,
-                    user_id: user_id
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    alert(data.error || "Error unreserving item.");
-                    document.querySelector("#reserved-table tbody").appendChild(reservedRow); // Re-add item in case of error
-                    if (noReservedItemsMessage) {
-                        noReservedItemsMessage.style.display = "none"; // Hide "No reserved items" message again
-                    }
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Error processing unreserve request.");
-                document.querySelector("#reserved-table tbody").appendChild(reservedRow); // Re-add item in case of error
-                if (noReservedItemsMessage) {
-                    noReservedItemsMessage.style.display = "none";
-                }
-            });
-        }
-    
-        // Run checkUnreservedItems on page load to set the initial state of "Empty" message
-        document.addEventListener("DOMContentLoaded", checkUnreservedItems);
-
-        function editItem(event, itemName, itemDescription, user_id) {
-            console.log("editing item")
-            event.preventDefault();
-            event.stopPropagation();
-
-            const row = event.target.closest("tr");
-            const nameCell = row.querySelector(".item-name");
-            const descCell = row.querySelector(".item-description");
-
-            nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name">`;
-            descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
-
-            const editIconCell = row.querySelector(".edit-icon").parentElement;
-            editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, '${itemName}', '${itemDescription}', '${user_id}')">💾</span>`;
-        }
-
-        function saveItem(event, originalName, originalDescription, user_id) {
-            console.log("saving item")
-            event.preventDefault();
-            event.stopPropagation();
-
-            const row = event.target.closest("tr");
-            const newName = row.querySelector(".edit-name").value;
-            const newDescription = row.querySelector(".edit-description").value;
-
-            fetch("{{ url_for('admin.edit_wishlist_item') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    original_name: originalName,
-                    original_description: originalDescription,
-                    new_name: newName,
-                    new_description: newDescription,
-                    user_id: user_id
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    row.querySelector(".item-name").innerText = newName;
-                    row.querySelector(".item-description").innerText = newDescription;
-
-                    const saveIconCell = row.querySelector(".save-icon").parentElement;
-                    saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, '${newName}', '${newDescription}', '${user_id}')">✎</span>`;
-                } else {
-                    alert(data.error || "Error saving changes.");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        }
-
-        function removeItem(event, itemName, itemDescription, user_id) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            fetch("{{ url_for('admin.remove_wishlist_item') }}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ 
-                    wishlist_item: itemName,
-                    wishlist_description: itemDescription,
-                    user_id: user_id
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const row = document.querySelector(`tr[data-item="${itemName} - ${itemDescription}"]`);
-                    if (row) {
-                        row.remove();
-                    }
-                    
-                    // Check if the wishlist is now empty
-                    const tableBody = document.querySelector(".wishlist-table tbody");
-                    if (tableBody.children.length === 0) {
-                        document.getElementById("no-items").style.display = "block";
-                    }
-                } else {
-                    alert(data.error || "Error removing item.");
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        }
-
-    </script>
 </body>
 </html>
