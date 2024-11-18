@@ -136,6 +136,8 @@ a.back-link:hover {
 
 
 
+
+
 /* Styl zakładki */
 .bottom-tab {
     position: fixed;
@@ -327,6 +329,81 @@ a.back-link:hover {
 .user-wishlist-section h3 {
     margin-bottom: 10px;
 }
+
+
+
+
+/* Main collapsible for the user section */
+.main-collapsible {
+    background-color: #004085;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    text-align: left;
+    outline: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.main-collapsible.active {
+    background-color: #0074e9;
+}
+
+/* Style for the nested users list */
+.users-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-item {
+    margin-bottom: 10px;
+}
+
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.user-text {
+    font-size: 16px;
+    color: #444;
+}
+
+.collapsible {
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    color: #444;
+    padding: 0;
+}
+
+/* Collapsible content (hidden by default) */
+.content {
+    display: none;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.inline-label {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Adjust spacing between label and checkbox if needed */
+    margin: 0; /* Optional: to remove extra space around the element */
+}
+
 
 /* === STYLIZACJA DLA RESPONSYWNOŚCI === */
 @media (max-width: 480px) {

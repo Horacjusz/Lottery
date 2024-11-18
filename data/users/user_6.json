@@ -1,0 +1,16 @@
+{
+    "user_ID": 6,
+    "name": "Jeremy Jones",
+    "username": "user_6",
+    "password": "test",
+    "visible": true,
+    "choosable": true,
+    "spouse": null,
+    "assignment": null,
+    "assigned_to": null,
+    "admin": false,
+    "wishlist": [
+        9
+    ],
+    "reserved_items": []
+}

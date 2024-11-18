@@ -1,0 +1,8 @@
+{
+    "item_id": 3,
+    "item_name": "whatever",
+    "item_description": "Arm treatment seem.",
+    "reserved_by": null,
+    "owner_id": 1,
+    "bought": false
+}

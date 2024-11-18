@@ -1,3 +1,0 @@
-cryptography==3.4.8
-Faker==30.8.2
-Flask==3.1.0

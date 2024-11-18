@@ -1,0 +1,17 @@
+{
+    "user_ID": 8,
+    "name": "Kevin Fuentes",
+    "username": "user_8",
+    "password": "test",
+    "visible": true,
+    "choosable": true,
+    "spouse": null,
+    "assignment": null,
+    "assigned_to": null,
+    "admin": false,
+    "wishlist": [
+        10,
+        11
+    ],
+    "reserved_items": []
+}

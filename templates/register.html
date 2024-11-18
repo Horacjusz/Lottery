@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ 'Edycja danych użytkownika' if user_data else 'Rejestracja' }}</title>
+    <title>{{ 'Edycja danych użytkownika' if edit_mode else 'Rejestracja' }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
 </head>
 <body>
@@ -11,7 +11,7 @@
         <h2>{{ 'Edycja danych użytkownika' if user_data else 'Rejestracja' }}</h2>
         <form action="{{ url_for('user.edit_user' if edit_mode else 'auth.register') }}" method="POST">
             <!-- Username field -->
-            <label for="username">Nazwa użytkownika</label>
+            <label for="username">Nazwa użytkownika (login)</label>
             <input type="text" id="username" name="username" value="{{ user_data.username if edit_mode else '' }}" required {% if username_exists %}class="error"{% endif %}>
 
             {% if error_message %}
@@ -19,29 +19,48 @@
             {% endif %}
 
             <!-- Name input field -->
-            <label for="name">Name</label>
+            <label for="name">Imię i nazwisko (jak będą widzieć Cię inni)</label>
             <input type="text" id="name" name="name" value="{{ user_data.name if edit_mode else '' }}" required>
         
             <!-- Spouse dropdown -->
-            <label for="spouse">Spouse</label>
-            <select name="spouse" id="spouse">
-                <option value="None" {% if user_data.spouse is none %}selected{% endif %}>No spouse</option>
+             
+            {% if settings.LOTTERY_ACTIVE %}
+                <label for="spouse">W trakcie trwania losowania{% if not edit_mode %} nie można wybrać małżonka{% else %} nie można zmienić/wybrać małżonka{% endif %}:</label>
+            {% else %}
+                <label for="spouse">Małżonek{% if not edit_mode %} (jeśli nie widzisz swojego, nie martw się, pewnie jeszcze nie stworzył konta){% endif %}</label>
+            {% endif %}      
+            <select name="spouse" id="spouse" {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}>
+                <option value="None" {% if user_data.spouse is none %}selected{% endif %}>Brak</option>
+                {% if user_data.spouse is not none %}
+                    <option value="{{ user_data.spouse }}" selected>
+                        {{ users_data[user_data.spouse].name }}
+                    </option>
+                {% endif %}
                 {% for spouse in available_spouses %}
-                    <option value="{{ spouse.id }}" {% if user_data.spouse == spouse.id %}selected{% endif %}>
+                    <option value="{{ spouse.id }}" 
+                        {% if user_data.spouse == spouse.id %}selected{% endif %}>
                         {{ spouse.name }}
                     </option>
                 {% endfor %}
             </select>
 
             <!-- Choosable checkbox -->
-            <label for="choosable">Weź udział w losowaniu:</label>
-            <input type="checkbox" id="choosable" name="choosable" {% if user_data.choosable %}checked{% endif %}>
+            {% if settings.LOTTERY_ACTIVE %}
+                <label for="choosable">W trakcie trwania losowania{% if not edit_mode %} nie można stworzyć konta biorącego w nim udział{% else %} nie można do niego dołączyć ani go opuścić{% endif %}:</label>
+            {% else %}
+                <label for="choosable">Weź udział w losowaniu{% if not edit_mode %} (Jeśli chcesz móc kogoś wylosować i być wylosowanym){% endif %}:</label>
+            {% endif %}
+            <input type="checkbox" id="choosable" name="choosable"
+                {% if not edit_mode %}selected{% endif %}
+                {% if user_data.choosable and edit_mode %}checked{% endif %}
+                {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}>
+            
 
             <!-- Password handling -->
-            <label for="password">{% if edit_mode %}Wpisz hasło (to też okazja, żeby je zmienić):{% else %}Hasło:{% endif %}</label>
+            <label for="password">{% if edit_mode %}Nowe hasło (może pozostać puste):{% else %}Hasło:{% endif %}</label>
             <input type="password" id="password" name="password">
         
-            <label for="confirm_password">Potwierdź hasło:</label>
+            <label for="confirm_password">Potwierdź hasło{% if edit_mode %} (może pozostać puste){% endif %}:</label>
             <input type="password" id="confirm_password" name="confirm_password">
 
             {% if error_message_password %}
