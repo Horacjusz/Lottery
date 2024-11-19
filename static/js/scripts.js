@@ -35,11 +35,12 @@ function submitDrawForm(user_id) {
     });
 }
 
-// Function to toggle lottery active state
 function toggleLotteryActive(event) {
+    console.log("Toggling lottery");
+
     event.preventDefault();
 
-    const url = "/admin/toggle_lottery"; // Use a static URL since `url_for` cannot be used in JS files
+    const url = "/admin/toggle_lottery"; // This matches the blueprint's URL prefix and route
 
     fetch(url, {
         method: "POST",
@@ -47,10 +48,14 @@ function toggleLotteryActive(event) {
             "Content-Type": "application/json",
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to toggle lottery status.");
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            // Update button text and class
             const button = document.getElementById("lottery-toggle-btn");
             const statusText = document.getElementById("lottery-status");
 
@@ -78,26 +83,27 @@ function toggleLotteryActive(event) {
 
 
 
-document.addEventListener("DOMContentLoaded", function() {
-    // Toggle for the main user list
-    const mainCollapsible = document.querySelector(".main-collapsible");
-    const userList = document.querySelector(".users-list");
-    mainCollapsible.addEventListener("click", function() {
-        this.classList.toggle("active");
-        userList.style.display = userList.style.display === "block" ? "none" : "block";
-        this.textContent = userList.style.display === "block" ? "Hide" : "Show";
-    });
 
-    // Toggle for individual user attributes
-    const userCollapsibles = document.querySelectorAll(".user-collapsible");
-    userCollapsibles.forEach(button => {
-        button.addEventListener("click", function() {
-            const userContent = this.parentElement.nextElementSibling; // Correct sibling selection
-            userContent.style.display = userContent.style.display === "block" ? "none" : "block";
-            this.textContent = userContent.style.display === "block" ? "-" : "+";
-        });
-    });
-});
+// document.addEventListener("DOMContentLoaded", function() {
+//     // Toggle for the main user list
+//     const mainCollapsible = document.querySelector(".main-collapsible");
+//     const userList = document.querySelector(".users-list");
+//     mainCollapsible.addEventListener("click", function() {
+//         this.classList.toggle("active");
+//         userList.style.display = userList.style.display === "block" ? "none" : "block";
+//         this.textContent = userList.style.display === "block" ? "Hide" : "Show";
+//     });
+
+//     // Toggle for individual user attributes
+//     const userCollapsibles = document.querySelectorAll(".user-collapsible");
+//     userCollapsibles.forEach(button => {
+//         button.addEventListener("click", function() {
+//             const userContent = this.parentElement.nextElementSibling; // Correct sibling selection
+//             userContent.style.display = userContent.style.display === "block" ? "none" : "block";
+//             this.textContent = userContent.style.display === "block" ? "-" : "+";
+//         });
+//     });
+// });
 
 function unreserveItem(event, item_id) {
     event.preventDefault();
@@ -132,11 +138,12 @@ function unreserveItem(event, item_id) {
 }
 
 
-function markItemBought(event, item_id) {
+
+function toggleBought(event, item_id) {
     event.preventDefault();
     event.stopPropagation();
 
-    fetch(`/items/bought/${item_id}`, {
+    fetch(`/items/toggle_buy/${item_id}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -147,10 +154,15 @@ function markItemBought(event, item_id) {
             if (data.success) {
                 const reservedRow = document.querySelector(`tr[data-item-id="${item_id}"]`);
                 if (reservedRow) {
-                    reservedRow.classList.add("reserved-green"); // Apply the green background
+                    // Toggle the green background based on the new bought status
+                    if (data.bought) {
+                        reservedRow.classList.add("reserved-green");
+                    } else {
+                        reservedRow.classList.remove("reserved-green");
+                    }
                 }
             } else {
-                alert(data.error || "Error marking item as bought.");
+                alert(data.error || "Error toggling bought status.");
             }
         })
         .catch((error) => {
@@ -257,5 +269,126 @@ function removeItem(event, item_id) {
     });
 }
 
+function updateUser(event, user_id) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const name = document.getElementById(`name-${user_id}`).value;
+    const username = document.getElementById(`username-${user_id}`).value;
+    const password = document.getElementById(`password-${user_id}`).value;
+    const choosable = document.getElementById(`choosable-${user_id}`).checked;
+    const admin = document.getElementById(`admin-${user_id}`).checked;
+    const visible = document.getElementById(`visible-${user_id}`).checked;
+
+    let spouseElement = document.querySelector(`#spouse-${user_id}`);
+    const spouse = spouseElement ? spouseElement.value : null;
+
+    const payload = {
+        new_name: name,
+        new_username: username,
+        new_password: password,
+        new_choosable: choosable,
+        new_visible: visible,
+        new_admin: admin,
+        new_spouse: spouse,
+    };
+
+    console.log("Payload being sent:", payload); // Debugging
+
+    fetch(`/users/update/${user_id}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.success) {
+                alert("User updated successfully!");
+                location.reload(); // Optional: Reload the page to see changes
+            } else {
+                alert(data.error || "Failed to update user.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error updating user:", error);
+            alert("An error occurred while updating the user.");
+        });
+}
 
 
+
+
+function addItem(owner_id) {
+    console.log("Adding item");
+    const itemInput = document.getElementById(`wishlist_item-${owner_id}`);
+    const descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
+
+    // Check if elements exist
+    if (!itemInput || !descriptionInput) {
+        alert("Error: Missing input fields for adding items.");
+        console.error(`Input fields not found for user ID: ${owner_id}`);
+        return;
+    }
+
+    const itemName = itemInput.value.trim();
+    const itemDescription = descriptionInput.value.trim();
+
+    if (!itemName) {
+        alert("Nazwa przedmiotu jest wymagana.");
+        return;
+    }
+
+    fetch(`/items/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            item_name: itemName,
+            item_description: itemDescription,
+            owner_id: owner_id,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                updateWishlist(owner_id, data.item); // Update wishlist with the new item
+                itemInput.value = ""; // Clear the input fields
+                descriptionInput.value = "";
+            } else {
+                alert(data.error || "Nie udało się dodać przedmiotu.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error adding item:", error);
+            alert("Wystąpił błąd podczas dodawania przedmiotu.");
+        });
+}
+
+
+function updateWishlist(owner_id, item) {
+    const wishlistTable = document.getElementById("wishlist-table");
+    const newRow = document.createElement("tr");
+    newRow.setAttribute("data-item-id", item.item_id);
+
+    newRow.innerHTML = `
+        <td>
+            <span class="item-name">${item.item_name}</span>
+            <span class="item-description">${item.item_description}</span>
+        </td>
+        <td>
+            <span class="edit-icon" onclick="editItem(event, '${item.item_id}', '${item.item_name}', '${item.item_description}')">✎</span>
+        </td>
+        <td>
+            <span class="remove-icon" onclick="removeItem(event, ${item.item_id})">×</span>
+        </td>
+    `;
+    wishlistTable.querySelector("tbody").appendChild(newRow);
+}

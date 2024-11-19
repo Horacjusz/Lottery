@@ -1,19 +1,18 @@
 {
     "user_ID": 4,
-    "name": "Devin Wolf",
+    "name": "Mrs. Gina Greene MD",
     "username": "user_4",
     "password": "test",
     "visible": true,
     "choosable": true,
     "spouse": null,
     "assignment": null,
-    "assigned_to": null,
+    "assigned_to": 1,
     "admin": false,
     "wishlist": [
-        3,
-        4,
-        5,
-        6
+        8,
+        9,
+        10
     ],
     "reserved_items": []
 }

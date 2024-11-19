@@ -431,6 +431,21 @@ a.back-link:hover {
 }
 
 
+.lottery-btn {
+    padding: 10px 20px;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+.lottery-enabled {
+    background-color: green;
+}
+.lottery-disabled {
+    background-color: rgb(255, 166, 0);
+}
+
+
 /* === STYLIZACJA DLA RESPONSYWNOŚCI === */
 @media (max-width: 480px) {
     .login-container, .dashboard-container {

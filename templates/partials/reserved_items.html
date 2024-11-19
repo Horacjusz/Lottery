@@ -1,0 +1,21 @@
+<table class="wishlist-table" id="reserved-table">
+    <tbody>
+        {% for item_id in reserved_items %}
+            {% set item = items_data[item_id] %}
+            <tr class="reserved-item {% if item.bought %}reserved-green{% endif %}" data-item-id="{{ item_id }}">
+                <td>
+                    <span class="item-name">{{ item.item_name }}</span>
+                    <span class="item-description">{{ item.item_description }}</span>
+                    <span class="item-owner">{{ item.owner_name }}</span>
+                </td>
+                <td>
+                    <span class="edit-icon" onclick="unreserveItem(event, '{{ item_id }}')">×</span>
+                </td>
+                <td>
+                    <span class="edit-icon" onclick="toggleBought(event, '{{ item_id }}')">💲</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p id="no-reserved-items" style="display: {% if reserved_items|length == 0 %}block{% else %}none{% endif %};">Brak zarezerwowanych przedmiotów</p>

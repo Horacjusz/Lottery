@@ -1,6 +1,6 @@
 {
     "user_ID": 8,
-    "name": "Lauren Nicholson",
+    "name": "Dawn Snow",
     "username": "user_8",
     "password": "test",
     "visible": true,
@@ -10,9 +10,6 @@
     "assigned_to": null,
     "admin": false,
     "wishlist": [
-        16,
-        17,
-        18,
         19,
         20
     ],

@@ -5,109 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel użytkownika</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
 </head>
 <body>
     <div class="dashboard-container">
-        <h2>Witaj, {{ user_data.name }}!</h2>
+        {% set admin = false %}
+        <h2>Witaj, {{ user.name }}!</h2>
         <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.</p>
 
         <div class="section">
             <h3>Losowanie</h3>
-        
-            {% if assigned_user is not none %}
+
+            {% if user.assignment is not none %}
+                {% set assignment = user.assignment %}
                 <!-- If an assignment exists, display the assigned user's information in a two-column table -->
                 <div class="assigned-user-info">
-                    <p>Wylosowałeś: <strong>{{ assigned_user.name }}</strong></p>
+                    <p>Wylosowałeś: <strong>{{ assignment.name }}</strong></p>
                     <h4>Lista życzeń:</h4>
-                    
-                    {% set unreserved_items = assigned_user.wishlist | selectattr("reserved_by", "equalto", none) | list %}
-                    
-                    <table class="wishlist-table" id="assigned-user-wishlist">
-                        <tbody>
-                            {% for item in unreserved_items %}
-                                <tr data-item="{{ item.name }} - {{ item.description }}">
-                                    <td>
-                                        <span class="item-name">{{ item.name }}</span>
-                                        <span class="item-description">{{ item.description }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="approve-icon" onclick="acceptItem(event, '{{ assigned_user.username }}', '{{ assigned_user.name }}', '{{ item.name|escape }}', '{{ item.description|escape }}')">✔</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    {% include 'partials/wishlist.html' %}
                     
                     <!-- Placeholder for Empty message, hidden by default -->
                     <p id="empty-message" style="display: none;">Nic tu nie ma ¯\\_(ツ)_/¯</p>
                 </div>
                 
-            {% elif not user_data.choosable %}
+            {% elif not user.choosable %}
                 <!-- If choosable is False and assignment is None, display a message -->
                 <p>Ty nie losujesz</p>
             {% else %}
                 <!-- If assignment is None and choosable is True, display the draw button -->
-                <button id="draw-button" onclick="startDraw()">Rozpocznij losowanie</button>
-                <div id="draw-result"></div>
+                {% include 'partials/draw_button.html' %}
             {% endif %}
         </div>
         
         <div class="section">
             <h3>Twoje zarezerwowane przedmioty:</h3>
-            <p id="no-reserved-items" {% if reserved_items and reserved_items|length > 0 %}style="display: none;"{% endif %}>Nie zarezerwowałeś jeszcze żadnych przedmiotów.</p>
-            <table class="wishlist-table" id="reserved-table">
-                <tbody>
-                    {% for item in reserved_items %}
-                        <tr class="reserved-item" data-item="{{ item.name }} - {{ item.description }}">
-                            <td>
-                                <span class="item-name">{{ item.name }}</span>
-                                <span class="item-description">{{ item.description }}</span>
-                                <span class="item-owner">{{ item.owner_name }}</span>
-                            </td>
-                            <td><span class="remove-icon" onclick="unreserveItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}', '{{ item.owner_username|escape }}', '{{ item.owner_name|escape }}')">×</span></td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <p>
+                {% set reserved_items = user.reserved_items %}
+                {% include 'partials/reserved_items.html' %}
+            </p>
         </div>
 
 
-        <div class="section">
+        {# <div class="section">
             <a href="{{ url_for('user.user_list') }}" class="dashboard-link">Lista Użytkowników</a>
-        </div>
+        </div> #}
 
         <div class="section">
             <h3>Twoja lista życzeń:</h3>
-            <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}> tu jeszcze nie ma</p>
-            <table class="wishlist-table" id="wishlist-table">
-                <tbody>
-                    {% for item in wishlist %}
-                        <tr data-item="{{ item.name }} - {{ item.description }}">
-                            <td>
-                                <span class="item-name">{{ item.name }}</span>
-                                <span class="item-description">{{ item.description }}</span>
-                            </td>
-                            <td><span class="edit-icon" onclick="editItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}')">✎</span></td>
-                            <td><span class="remove-icon" onclick="removeItem(event, '{{ item.name|escape }}', '{{ item.description|escape }}')">×</span></td>
-                        </tr>
-                    {% endfor %}
+            {% set wishlist = user.wishlist %}
+            <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
+            
+            {% include 'partials/own_wishlist.html' %}
 
-                </tbody>
-            </table>
 
-            <form id="wishlist-form">
-                <h4>Dodaj przedmiot</h4>
-                <input type="text" id="wishlist_item" name="wishlist_item" placeholder="Nazwa przedmiotu" required>
-                <input type="text" id="wishlist_description" name="wishlist_description" placeholder="Opis przedmiotu">
-                <button type="submit">Dodaj przedmiot</button>
-            </form>
         </div>
 
 
 
-        <div class="section">
+        {# <div class="section">
             <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
-        </div>
+        </div> #}
 
         <div class="section">
             <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Wyloguj się</a>
@@ -115,7 +72,7 @@
     </div>
 
     <script>
-        function checkUnreservedItems() {
+        {# function checkUnreservedItems() {
             const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
             const emptyMessage = document.querySelector(".assigned-user-info p.empty-message");
 
@@ -450,7 +407,7 @@
                 }
             })
             .catch(error => console.error("Error:", error));
-        });
+        }); #}
     </script>
 </body>
 </html>

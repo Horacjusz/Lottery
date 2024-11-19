@@ -9,6 +9,7 @@ from flask import Blueprint, request, session, jsonify, redirect, url_for, flash
 import json
 
 from services.verification import *
+from settings.tokens import *
 
 # from services.user_service import *  # Import necessary services
 
@@ -20,7 +21,7 @@ auth_blueprint = Blueprint("auth", __name__)
 def login():
     error_message = ""
     if request.method == "POST":
-        username = request.form["username"]
+        username = request.form[USERNAME]
         print(username)
         password = request.form["password"]
         print(password)
@@ -28,13 +29,13 @@ def login():
         print(user_id)
 
         if verify_user(username, password):
-            session["username"] = username
-            session["user_id"] = user_id
-            session["is_admin"] = is_admin(user_id)
+            session[USERNAME] = username
+            session[USER_ID] = user_id
+            session[ADMIN] = is_admin(user_id)
             flash("Zalogowano pomyślnie!", "success")
 
             # Redirect to the appropriate dashboard
-            if session["is_admin"] and not is_visible(user_id):
+            if session[ADMIN] and not is_visible(user_id):
                 return redirect(url_for("admin.admin_dashboard"))
             return redirect(url_for("dashboard.dashboard"))
         else:
@@ -44,7 +45,20 @@ def login():
 
 @auth_blueprint.route("/logout")
 def logout():
-    session.pop("username", None)
-    session.pop("user_id", None)
+    session.pop(USERNAME, None)
+    session.pop(USER_ID, None)
     flash("Wylogowano pomyślnie!", "success")
     return redirect(url_for("auth.login"))
+
+# @auth_blueprint.route("/verify_password", methods=["GET", "POST"])
+# def verify_password() :
+#     if "username" not in session:
+#         flash("Musisz być zalogowany, aby edytować swoje dane.", "error")
+#         return redirect(url_for("auth.login"))
+    
+    
+#     return render_template("verify_password.html", error="Nieprawidłowe hasło.")
+
+@auth_blueprint.route("/register")
+def register() :
+    _

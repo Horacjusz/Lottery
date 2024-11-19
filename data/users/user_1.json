@@ -1,14 +1,21 @@
 {
     "user_ID": 1,
-    "name": "John Smith",
+    "name": "Christina Gutierrezee",
     "username": "user_1",
     "password": "test",
     "visible": true,
     "choosable": true,
     "spouse": null,
-    "assignment": null,
+    "assignment": 4,
     "assigned_to": null,
     "admin": false,
-    "wishlist": [],
+    "wishlist": [
+        1,
+        2,
+        3,
+        4,
+        21,
+        23
+    ],
     "reserved_items": []
 }

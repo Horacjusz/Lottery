@@ -19,8 +19,7 @@ def create_item(owner_id, item_data = None) :
         from generation.generate import faker
         item_data[ITEM_NAME] = faker.word()
     if item_data.get(ITEM_DESCRIPTION) is None :
-        from generation.generate import faker
-        item_data[ITEM_DESCRIPTION] = faker.sentence()
+        item_data[ITEM_DESCRIPTION] = ""
     if item_data.get(RESERVED_BY) is None :
         item_data[RESERVED_BY] = None
     if item_data.get(OWNER_ID) is None :
@@ -101,8 +100,10 @@ def unreserve_item(item_id) :
     print(f"Item {item_id} has been unreserved")
     return True
 
-def buy_item(item_id) :
+def toggle_buy_item(item_id) :
     check_item_existence(item_id)
     item_data = load_item_file(item_id)
-    item_data[BOUGHT] = True
-    
+    item_data[BOUGHT] = not item_data[BOUGHT]
+    save_item_file(item_data)
+    print(f"Item {item_id} bought? {item_data[BOUGHT]}")
+    return item_data[BOUGHT]

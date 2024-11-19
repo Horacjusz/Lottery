@@ -1,13 +1,14 @@
 from flask import Flask, redirect, url_for
 from settings.settings import *  # Import necessary settings
 
-# from routes.user_routes import user_blueprint
 from routes.auth_routes import auth_blueprint
-# from routes.dashboard_routes import dashboard_blueprint
+from routes.dashboard_routes import dashboard_blueprint
 from routes.draw_routes import draw_blueprint
 # from routes.debug_routes import debug_blueprint
 from routes.admin_routes import admin_blueprint
 from routes.item_routes import item_blueprint
+from routes.user_routes import user_blueprint
+
 
 
 app = Flask(__name__, static_folder='static')
@@ -17,10 +18,11 @@ app.register_blueprint(item_blueprint, url_prefix="/items")
 # Register blueprints
 # app.register_blueprint(user_blueprint)
 app.register_blueprint(auth_blueprint)
-# app.register_blueprint(dashboard_blueprint)
+app.register_blueprint(dashboard_blueprint)
 app.register_blueprint(draw_blueprint, url_prefix="/draw")
 # app.register_blueprint(debug_blueprint)
 app.register_blueprint(admin_blueprint, url_prefix="/admin")
+app.register_blueprint(user_blueprint, url_prefix="/users")
 
 
 @app.route("/")

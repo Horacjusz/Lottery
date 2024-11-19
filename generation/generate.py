@@ -28,5 +28,5 @@ def main(num_of_users = 10, new_data = True, new_users = True, new_items = True)
         user_id = user[USER_ID]
         save_user_file(user)
         for _ in range(randint(0,5)) :
-            create_item(user_id)
+            create_item(user_id, item_data={ITEM_DESCRIPTION: faker.sentence()})
         print(f"User {user[USER_ID]} created and saved.")

@@ -1,0 +1,17 @@
+{% set unreserved_items = assignment.wishlist | selectattr("reserved_by", "equalto", none) | list %}
+
+<table class="wishlist-table" id="assigned-user-wishlist">
+    <tbody>
+        {% for item in unreserved_items %}
+            <tr data-item="{{ item.name }} - {{ item.description }}">
+                <td>
+                    <span class="item-name">{{ item.name }}</span>
+                    <span class="item-description">{{ item.description }}</span>
+                </td>
+                <td>
+                    <span class="approve-icon" onclick="acceptItem(event, '{{ assigned_user.username }}', '{{ assigned_user.name }}', '{{ item.name|escape }}', '{{ item.description|escape }}')">✔</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

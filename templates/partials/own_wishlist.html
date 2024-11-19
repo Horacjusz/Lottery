@@ -1,0 +1,28 @@
+<table class="wishlist-table" id="wishlist-table">
+    <tbody>
+        {% for item_id in wishlist %}
+            {% set item = items_data[item_id] %}
+            <tr data-item-id="{{ item_id }}">
+                <td>
+                    <span class="item-name">{{ item.item_name }}</span>
+                    <span class="item-description">{{ item.item_description }}</span>
+                </td>
+                <td>
+                    <span class="edit-icon" 
+                          onclick="editItem(event, '{{ item_id }}', '{{ item.item_name|escape }}', '{{ item.item_description|escape }}')">✎</span>
+                </td>
+                <td>
+                    <span class="remove-icon" 
+                          onclick="removeItem(event, {{ item_id }})">×</span>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form id="wishlist-form-{{ user.user_ID }}">
+    <h4>Dodaj przedmiot</h4>
+    <input type="text" id="wishlist_item-{{ user.user_ID }}" name="wishlist_item" placeholder="Nazwa przedmiotu" required>
+    <input type="text" id="wishlist_description-{{ user.user_ID }}" name="wishlist_description" placeholder="Opis przedmiotu">
+    <button type="button" onclick="addItem('{{ user.user_ID }}')">Dodaj przedmiot</button>
+</form>

@@ -1,8 +1,8 @@
 {
     "item_id": 15,
-    "item_name": "seat",
-    "item_description": "Ready high later you.",
+    "item_name": "painting",
+    "item_description": "Vote mother artist you support.",
     "reserved_by": null,
-    "owner_id": 7,
+    "owner_id": 5,
     "bought": false
 }

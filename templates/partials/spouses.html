@@ -1,0 +1,17 @@
+<select name="spouse" id="spouse" {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}>
+    <option value="None" {% if user.spouse is none %}selected{% endif %}>Brak</option>
+    {% if user_spouse is not none %}
+        <option value="{{ user.spouse }}" selected>
+            {{ users_data[user_spouse].name }} - {{ user_spouse }}
+        </option>
+    {% endif %}
+    {% for spouse_id in available_spouses %}
+        {% if spouse_id != user_id %}
+            {% set spouse = users_data[spouse_id] %}
+            <option value="{{ spouse.id }}" 
+                {% if user.spouse == spouse.id %}selected{% endif %}>
+                {{ spouse.name }} - {{ spouse.user_ID }}
+            </option>
+        {% endif %}
+    {% endfor %}
+</select>

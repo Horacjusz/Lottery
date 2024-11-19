@@ -1,0 +1,10 @@
+{
+    "ITEM_NAME": "lego",
+    "ITEM_DESCRIPTION": "du\u017cy zestaw",
+    "item_id": 21,
+    "item_name": "receive",
+    "item_description": "",
+    "reserved_by": null,
+    "owner_id": "1",
+    "bought": false
+}
