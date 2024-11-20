@@ -1,11 +1,9 @@
 from flask import Blueprint, request, session, jsonify, redirect, url_for, flash, render_template
-# from services.user_service import get_id, verify_user, is_admin
-# from config.settings import USERS_DATA_FILE
-# from services.encryption_service import decrypt_file, encrypt_file, update_pool_files
-# from services.user_service import get_available_spouses
-# from services.user_service import validate_passwords
-# from services.data_service import data_to_dict, print_data
-# from services.data_service import load_settings
+from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request
+from services.verification import is_visible
+from settings.settings import load_settings, save_settings
+from services.lists_service import get_available_spouses, get_all_users, get_all_items
+from settings.tokens import *
 import json
 
 from services.verification import *
@@ -61,4 +59,4 @@ def logout():
 
 @auth_blueprint.route("/register")
 def register() :
-    _
+    return render_template("/register.html", settings = load_settings(), user = None, available_spouses = get_available_spouses(), users_data = get_all_users(), edit_mode = False, admin = False)

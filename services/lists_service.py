@@ -6,8 +6,9 @@ def get_available_spouses() :
     ids = get_all_ids(USERS)
     spouses = []
     for ID in ids :
-        if load_user_file(ID)[SPOUSE] is None :
-            spouses.append(ID)
+        spouse = load_user_file(ID)
+        if spouse[SPOUSE] is None :
+            spouses.append(spouse)
     return spouses
 
 def get_all_users() :
@@ -22,5 +23,4 @@ def get_all_items() :
     items = {}
     for ID in ids :
         items[ID] = (load_item_file(ID))
-        print(items[ID])
     return items

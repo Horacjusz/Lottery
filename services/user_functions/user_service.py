@@ -9,6 +9,7 @@ faker = Faker()
 
 
 def check_user_existence(user_id):
+    if user_id is None : return False
     if not os.path.exists(user_file_path(user_id)) :
         print(f"User with ID {user_id} does not exist")
         return False
@@ -158,7 +159,8 @@ def edit_user(user_id,
     if new_choosable is not None :
         user_data[CHOOSABLE] = new_choosable
     if new_spouse is not None :
-        user_data[SPOUSE] = new_spouse 
+        marriage(user_id, new_spouse)
+        user_data[SPOUSE] = new_spouse
     if new_assignment is not None :
         user_data[ASSIGNMENT] = new_assignment
     if new_assigned_to is not None :
@@ -172,7 +174,9 @@ def edit_user(user_id,
     if new_password is not None :
         user_data[PASSWORD] = new_password
         
-    if reset_spouse : user_data[SPOUSE] = None
+    if reset_spouse : 
+        marriage(user_id)
+        user_data[SPOUSE] = None
     if reset_assignment : user_data[ASSIGNMENT] = None
     if reset_assigned_to : user_data[ASSIGNED_TO] = None
     
@@ -181,3 +185,24 @@ def edit_user(user_id,
     
     save_user_file(user_data)
     return user_data
+
+def marriage(user_id, spouse_id = None) :
+    user_data = load_user_file(user_id)
+    prev_spouse = user_data[SPOUSE]
+    if prev_spouse == spouse_id : return
+    if prev_spouse is not None :
+        prev_spouse_data = load_user_file(prev_spouse)
+        prev_spouse_data[SPOUSE] = None
+        save_user_file(prev_spouse_data)
+    if spouse_id is not None :
+        spouse_data = load_user_file(spouse_id)
+        prev_spouse_spouse_id = spouse_data[SPOUSE]
+        spouse_data[SPOUSE] = user_id
+        if prev_spouse_spouse_id is not None :
+            prev_spouse_spouse_data = load_user_file(prev_spouse_spouse_id)
+            prev_spouse_spouse_data[SPOUSE] = None
+            save_user_file(prev_spouse_spouse_data)
+        save_user_file(spouse_data)
+    user_data[SPOUSE] = spouse_id
+    save_user_file(user_data)
+    return

@@ -1,18 +1,18 @@
 {
     "user_ID": 4,
-    "name": "Mrs. Gina Greene MD",
+    "name": "Nathan Johnson",
     "username": "user_4",
     "password": "test",
     "visible": true,
     "choosable": true,
     "spouse": null,
     "assignment": null,
-    "assigned_to": 1,
+    "assigned_to": null,
     "admin": false,
     "wishlist": [
-        8,
         9,
-        10
+        10,
+        11
     ],
     "reserved_items": []
 }

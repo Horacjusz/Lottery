@@ -26,6 +26,7 @@
             </div>
         </div>
         {% set admin = true %}
+        {% set edit_mode = false %}
         <div class="users-section">
             <p><strong>User list</strong></p>
             <button class="collapsible main-collapsible">Show</button>
@@ -55,10 +56,9 @@
 
                                 </p>
                                 <form id="update-user-form-{{ user_id }}" method="post">
-                                    
-                                    {% set user_spouse = user.spouse %}
+
                                     {% include 'partials/basic_user_changes.html' %}
-                                    <p><strong>Password:</strong> <input type="text" id="password-{{ user_id }}" value="{{ user.password }}"></p>
+
                                     <p>
                                         <strong>Admin:</strong>
                                         <input 
@@ -99,7 +99,6 @@
                 </ul>
             </div>
         </div>
-
 
         <div class="section">
             <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>

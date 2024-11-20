@@ -84,26 +84,26 @@ function toggleLotteryActive(event) {
 
 
 
-// document.addEventListener("DOMContentLoaded", function() {
-//     // Toggle for the main user list
-//     const mainCollapsible = document.querySelector(".main-collapsible");
-//     const userList = document.querySelector(".users-list");
-//     mainCollapsible.addEventListener("click", function() {
-//         this.classList.toggle("active");
-//         userList.style.display = userList.style.display === "block" ? "none" : "block";
-//         this.textContent = userList.style.display === "block" ? "Hide" : "Show";
-//     });
+document.addEventListener("DOMContentLoaded", function() {
+    // Toggle for the main user list
+    const mainCollapsible = document.querySelector(".main-collapsible");
+    const userList = document.querySelector(".users-list");
+    mainCollapsible.addEventListener("click", function() {
+        this.classList.toggle("active");
+        userList.style.display = userList.style.display === "block" ? "none" : "block";
+        this.textContent = userList.style.display === "block" ? "Hide" : "Show";
+    });
 
-//     // Toggle for individual user attributes
-//     const userCollapsibles = document.querySelectorAll(".user-collapsible");
-//     userCollapsibles.forEach(button => {
-//         button.addEventListener("click", function() {
-//             const userContent = this.parentElement.nextElementSibling; // Correct sibling selection
-//             userContent.style.display = userContent.style.display === "block" ? "none" : "block";
-//             this.textContent = userContent.style.display === "block" ? "-" : "+";
-//         });
-//     });
-// });
+    // Toggle for individual user attributes
+    const userCollapsibles = document.querySelectorAll(".user-collapsible");
+    userCollapsibles.forEach(button => {
+        button.addEventListener("click", function() {
+            const userContent = this.parentElement.nextElementSibling; // Correct sibling selection
+            userContent.style.display = userContent.style.display === "block" ? "none" : "block";
+            this.textContent = userContent.style.display === "block" ? "-" : "+";
+        });
+    });
+});
 
 function unreserveItem(event, item_id) {
     event.preventDefault();
@@ -269,61 +269,6 @@ function removeItem(event, item_id) {
     });
 }
 
-function updateUser(event, user_id) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const name = document.getElementById(`name-${user_id}`).value;
-    const username = document.getElementById(`username-${user_id}`).value;
-    const password = document.getElementById(`password-${user_id}`).value;
-    const choosable = document.getElementById(`choosable-${user_id}`).checked;
-    const admin = document.getElementById(`admin-${user_id}`).checked;
-    const visible = document.getElementById(`visible-${user_id}`).checked;
-
-    let spouseElement = document.querySelector(`#spouse-${user_id}`);
-    const spouse = spouseElement ? spouseElement.value : null;
-
-    const payload = {
-        new_name: name,
-        new_username: username,
-        new_password: password,
-        new_choosable: choosable,
-        new_visible: visible,
-        new_admin: admin,
-        new_spouse: spouse,
-    };
-
-    console.log("Payload being sent:", payload); // Debugging
-
-    fetch(`/users/update/${user_id}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            if (data.success) {
-                alert("User updated successfully!");
-                location.reload(); // Optional: Reload the page to see changes
-            } else {
-                alert(data.error || "Failed to update user.");
-            }
-        })
-        .catch((error) => {
-            console.error("Error updating user:", error);
-            alert("An error occurred while updating the user.");
-        });
-}
-
-
-
 
 function addItem(owner_id) {
     console.log("Adding item");
@@ -391,4 +336,70 @@ function updateWishlist(owner_id, item) {
         </td>
     `;
     wishlistTable.querySelector("tbody").appendChild(newRow);
+}
+
+
+function validatePasswords() {
+    const password = document.getElementById("password-new").value;
+    const confirmPassword = document.getElementById("confirm_password-new").value;
+
+    if (password && password !== confirmPassword) {
+        document.getElementById("error").textContent = "Hasła nie są identyczne. Spróbuj ponownie.";
+        return false; // Prevent form submission
+    }
+    return true;
+}
+
+function updateUser(event, user_id = null) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const idSuffix = user_id || 'new';
+    const name = document.getElementById(`name-${idSuffix}`).value;
+    const username = document.getElementById(`username-${idSuffix}`).value;
+    const password = document.getElementById(`password-${idSuffix}`).value;
+    const choosable = document.getElementById(`choosable-${idSuffix}`)?.checked || false;
+    const admin = document.getElementById(`admin-${idSuffix}`)?.checked || false;
+    const visible = document.getElementById(`visible-${idSuffix}`)?.checked || true;
+
+    const spouseElement = document.querySelector(`#spouse-${idSuffix}`);
+    const spouse = spouseElement ? spouseElement.value : null;
+
+    const payload = {
+        new_spouse: spouse,
+        new_name: name,
+        new_username: username,
+        new_password: password,
+        new_choosable: choosable,
+        new_visible: visible,
+        new_admin: admin,
+    };
+
+    console.log("Payload being sent:", payload);
+
+    fetch(`/users/update/${user_id || ''}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.success) {
+                const redirectUrl = edit_mode ? "/dashboard" : "/auth/login";
+                window.location.href = redirectUrl;
+            } else {
+                document.getElementById("error").textContent = data.error || "Failed to update user.";
+            }
+        })
+        .catch((error) => {
+            console.error("Error updating user:", error);
+            document.getElementById("error").textContent = "An error occurred while updating the user.";
+        });
 }

@@ -1,7 +1,7 @@
 {
+    "item_description": "Change degree base ten.",
     "item_id": 7,
-    "item_name": "rate",
-    "item_description": "Issue for spring claim.",
+    "item_name": "action",
     "reserved_by": null,
     "owner_id": 3,
     "bought": false

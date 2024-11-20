@@ -17,12 +17,11 @@ def admin_dashboard():
         # users = get_all_users()  # Assuming this function returns a list of user objects
         users_data = get_all_users()
         items_data = get_all_items()
-        return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), available_spouses = get_available_spouses(), users_data = users_data, items_data = items_data)
+        return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), available_spouses = get_available_spouses(), users_data = users_data, items_data = items_data, error_message = "")
     else:
         flash("Brak dostępu: musisz być administratorem.", "error")
         return redirect(url_for("auth.login"))
     
-
 
 
 @admin_blueprint.route("/toggle_lottery", methods=["POST"])

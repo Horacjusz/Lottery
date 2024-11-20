@@ -1,6 +1,6 @@
 {
     "user_ID": 5,
-    "name": "William Barton",
+    "name": "Sarah Crawford",
     "username": "user_5",
     "password": "test",
     "visible": true,
@@ -10,11 +10,7 @@
     "assigned_to": null,
     "admin": false,
     "wishlist": [
-        11,
-        12,
-        13,
-        14,
-        15
+        12
     ],
     "reserved_items": []
 }

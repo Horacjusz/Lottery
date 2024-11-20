@@ -1,8 +1,20 @@
 
-<p><strong>Name:</strong> <input type="text" id="name-{{ user_id }}" value="{{ user.name }}"></p>
-<p><strong>Username:</strong> <input type="text" id="username-{{ user_id }}" value="{{ user.username }}"></p>
 <p>
-    <strong>Choosable:</strong>
+    <strong>Imię i nazwisko:</strong>
+    <p>(lub co uważasz, ale tak Cię będą widzieć inni)</p>
+    <input type="text" id="name-{{ user_id }}" value="{{ user.name }}" {% if admin %}disabled{% endif %}>
+</p>
+{% if error_message %}
+    <p class="error-message">{{ error_message }}</p>
+{% endif %}
+<p>
+    <strong>Nazwa użytkownika:</strong>
+    <p>(login)</p>
+    <label for="username-{{ user_id | default('new') }}"><strong>Nazwa użytkownika:</strong></label>
+    <input type="text" id="username-{{ user_id | default('new') }}" name="username" value="{{ user.username | default('') }}">
+</p>
+<p>
+    <strong>{% if not settings.LOTTERY_ACTIVE %}Czy bierzesz udział w losowaniu?{% elif edit_mode %}Losowanie już trwa, nie można sie teraz wycofać{% else %}Nie można stworzyć konta biorącego udział w losowaniu, kiedy to już trwa{% endif %}:</strong>
     <input 
         type="checkbox" 
         id="choosable-{{ user_id }}" 
@@ -13,6 +25,15 @@
     >
 </p>
 <p>
-    <strong>Spouse:</strong>
     {% include 'partials/spouses.html' %}
 </p>
+<p>
+    <strong>Hasło:</strong>
+    {% if edit_mode %}
+        Wpisz żeby zmienić lub pozostaw puste żeby nic nie robić
+    {% endif %}
+    <!-- Password fields -->
+    <label for="password-{{ user_id | default('new') }}"><strong>Hasło:</strong></label>
+    <input type="password" id="password-{{ user_id | default('new') }}" name="password">
+</p>
+

@@ -1,8 +1,8 @@
 {
+    "item_description": "Give agent find third tonight.",
     "item_id": 15,
-    "item_name": "painting",
-    "item_description": "Vote mother artist you support.",
+    "item_name": "practice",
     "reserved_by": null,
-    "owner_id": 5,
+    "owner_id": 8,
     "bought": false
 }

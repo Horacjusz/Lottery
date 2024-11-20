@@ -1,6 +1,6 @@
 {
     "user_ID": 6,
-    "name": "George Norman",
+    "name": "Richard Tate",
     "username": "user_6",
     "password": "test",
     "visible": true,
@@ -9,8 +9,6 @@
     "assignment": null,
     "assigned_to": null,
     "admin": false,
-    "wishlist": [
-        16
-    ],
+    "wishlist": [],
     "reserved_items": []
 }

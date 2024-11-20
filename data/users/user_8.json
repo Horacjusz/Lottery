@@ -1,6 +1,6 @@
 {
     "user_ID": 8,
-    "name": "Dawn Snow",
+    "name": "John Nixon",
     "username": "user_8",
     "password": "test",
     "visible": true,
@@ -10,8 +10,8 @@
     "assigned_to": null,
     "admin": false,
     "wishlist": [
-        19,
-        20
+        15,
+        16
     ],
     "reserved_items": []
 }
