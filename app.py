@@ -57,5 +57,4 @@ def prepare_app() :
 
 if __name__ == "__main__":
     prepare_app()
-    port = int(os.getenv("PORT", 5000))
-    app.run(debug=os.getenv("FLASK_ENV") == "development", port=port)
+    app.run(debug = os.getenv("FLASK_ENV") == "development", port = int(os.getenv("PORT", 5000)), host = '0.0.0.0')
