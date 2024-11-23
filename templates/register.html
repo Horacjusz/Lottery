@@ -23,7 +23,6 @@
                     <input type="password" id="confirm_password-{{ user_id }}" name="password" value = "{{ user.password | default('') }}" {% if admin %}disabled{% endif %}>
                 </p>
 
-
                 <button type="submit">{{ 'Zapisz zmiany' if edit_mode else 'Zarejestruj' }}</button>
             </form>
             

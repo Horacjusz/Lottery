@@ -1,3 +1,4 @@
+import gunicorn
 from flask import Flask, redirect, url_for, session
 from datetime import timedelta
 from settings.settings import *
@@ -6,6 +7,7 @@ import os
 from services.database import initialize_db
 from settings.settings import DEFAULT_SETTINGS
 from services.file_service import save_settings
+from dotenv import load_dotenv
 
 from routes.auth_routes import auth_blueprint
 from routes.dashboard_routes import dashboard_blueprint
@@ -14,10 +16,11 @@ from routes.admin_routes import admin_blueprint
 from routes.item_routes import item_blueprint
 from routes.user_routes import user_blueprint
 
+load_dotenv()
 
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = 'your_secret_key'  # Set your secret key here
+app.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
 
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes = 5)
 app.config["SESSION_PERMANENT"] = True
@@ -47,7 +50,5 @@ def prepare_app() :
 
 if __name__ == "__main__":
     prepare_app()
-    
-    # port = int(os.environ.get("PORT", 5000))
-    # app.run(host='0.0.0.0', port=port)
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 5000))
+    app.run(debug=os.getenv("FLASK_ENV") == "development", port=port)

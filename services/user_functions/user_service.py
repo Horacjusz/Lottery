@@ -2,13 +2,11 @@ from services.retrieval import get_free_id, get_all_ids
 from services.file_service import save_user_file, load_user_file
 from settings.tokens import *
 from settings.settings import DEFAULT_PASSWORD, DEFAULT_NAME
-import os
-from faker import Faker
 from services.database import datasession
 from models.models import User
-
-faker = Faker()
-
+from services.draw_service import generate_valid_assignment
+from services.user_functions.user_draw import can_be_assigned
+from services.item_functions.item_service import delete_item, unreserve_item
 
 def check_user_existence(user_id):
     if user_id is None:
@@ -22,7 +20,6 @@ def check_user_existence(user_id):
     except Exception as e:
         print(f"Error checking existence of user with ID {user_id}: {e}")
         return False
-
 
 def create_user(user_data = None) :
     if user_data is None : 
@@ -65,57 +62,59 @@ def print_user(user_id) :
 def print_all_users() :
     for Id in get_all_ids(USERS) :
         print_user(Id)
-        
-# For future development
-# def delete_user(user_id) :
-#     from services.item_functions.item_service import unreserve_item, delete_item
-#     from services.user_functions.user_draw import can_be_assigned, generate_valid_assignment
-    
-#     if not check_user_existence(user_id) :
-#         print("User", user_id, "haven't existed")
+  
+# For future development      
+# def delete_user(user_id):
+#     if not check_user_existence(user_id):
+#         print("User", user_id, "does not exist.")
 #         return True
-    
-#     user_data = load_user_file(user_id)
-    
-#     if user_data[ASSIGNED_TO] is not None and user_data[ASSIGNMENT] is None :
-#         assignment_ID = user_data[ASSIGNED_TO]
-#         edit_user(assignment_ID, reset_assignment = True)
-#         edit_user(user_id, reset_assigned_to = True)
-#         if generate_valid_assignment() is None :
-#             edit_user(assignment_ID, new_assignment = user_id)
-#             edit_user(user_id, new_assigned_to = assignment_ID)
+
+#     user = datasession.query(User).filter_by(user_id=user_id).first()
+
+#     if not user:
+#         print(f"User {user_id} does not exist in the database.")
+#         return True
+
+#     if user.assigned_to is not None and user.assignment is None:
+#         assignment_id = user.assigned_to
+#         edit_user(assignment_id, reset_assignment=True)
+#         edit_user(user_id, reset_assigned_to=True)
+#         if generate_valid_assignment() is None:
+#             edit_user(assignment_id, new_assignment=user_id)
+#             edit_user(user_id, new_assigned_to=assignment_id)
 #             print("Cannot delete user due to assignment clutch")
 #             return False
-        
-#     if user_data[ASSIGNMENT] is not None and user_data[ASSIGNED_TO] is None :
-#         assignment_ID = user_data[ASSIGNMENT]
-#         edit_user(assignment_ID, reset_assigned_to = True)
-#         edit_user(user_id, reset_assignment = True)
-#         if generate_valid_assignment() is None :
-#             edit_user(assignment_ID, new_assigned_to = user_id)
-#             edit_user(user_id, new_assigment = assignment_ID)
-#             print("Cannot delete user due to assignment clutch")
-#             return False  
-    
-#     if user_data[ASSIGNMENT] is not None and user_data[ASSIGNED_TO] is not None :
-#         if can_be_assigned(user_data[ASSIGNED_TO], user_data[ASSIGNMENT]) :
-#             assigned_to = user_data[ASSIGNED_TO]
-#             assignment = user_data[ASSIGNMENT]
-#             print(assigned_to, assignment)
-#             edit_user(assigned_to, new_assignment = assignment)
-#             edit_user(assignment, new_assigned_to = assigned_to)
-#         else :
+
+#     if user.assignment is not None and user.assigned_to is None:
+#         assignment_id = user.assignment
+#         edit_user(assignment_id, reset_assigned_to=True)
+#         edit_user(user_id, reset_assignment=True)
+
+#         if generate_valid_assignment() is None:
+#             edit_user(assignment_id, new_assigned_to=user_id)
+#             edit_user(user_id, new_assignment=assignment_id)
 #             print("Cannot delete user due to assignment clutch")
 #             return False
-    
-#     for item in user_data[WISHLIST] :
-#         delete_item(item)
-    
-#     for item in user_data[RESERVED_ITEMS] :
-#         unreserve_item(item)
-    
-#     delete_user_file(user_id)
-#     print("User", user_id, "has been deleted")
+
+#     if user.assignment is not None and user.assigned_to is not None:
+#         if can_be_assigned(user.assigned_to, user.assignment):
+#             assigned_to = user.assigned_to
+#             assignment = user.assignment
+#             edit_user(assigned_to, new_assignment=assignment)
+#             edit_user(assignment, new_assigned_to=assigned_to)
+#         else:
+#             print("Cannot delete user due to assignment clutch")
+#             return False
+
+#     for item_id in user.wishlist:
+#         delete_item(item_id)
+
+#     for item_id in user.reserved_items:
+#         unreserve_item(item_id)
+
+#     datasession.delete(user)
+#     datasession.commit()
+#     print("User", user_id, "has been deleted.")
 #     return True
 
 def assign(user_id, assignment_id) :
