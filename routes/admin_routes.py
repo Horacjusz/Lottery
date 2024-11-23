@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request
+from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify
 from services.verification import is_visible
 from services.file_service import load_settings, save_settings
-from services.lists_service import get_available_spouses, get_all_users, get_all_items
+from services.lists_service import get_all_users, get_all_items
 from settings.tokens import *
 
 admin_blueprint = Blueprint("admin", __name__, template_folder="templates")
@@ -29,6 +29,7 @@ def toggle_lottery():
     print("Toggling lottery...")
 
     settings = load_settings()  # Load current settings
+    print(settings)
     settings["LOTTERY_ACTIVE"] = not settings["LOTTERY_ACTIVE"]  # Toggle the value
     save_settings(settings)  # Save updated settings
 

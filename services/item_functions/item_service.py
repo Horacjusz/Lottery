@@ -1,6 +1,7 @@
 from services.file_service import load_user_file, save_user_file, save_item_file, load_item_file, delete_item_file
 from services.user_functions.user_service import check_user_existence
 from settings.tokens import *
+from settings.settings import FAKER
 from services.retrieval import get_free_id
 from services.database import datasession
 from models.models import Item
@@ -29,8 +30,7 @@ def create_item(owner_id, item_data = None) :
     if item_data.get(ITEM_ID) is None :
         item_data[ITEM_ID] = get_free_id(ITEMS)
     if item_data.get(ITEM_NAME) is None :
-        from generation.generate import faker
-        item_data[ITEM_NAME] = faker.word()
+        item_data[ITEM_NAME] = FAKER.word()
     if item_data.get(ITEM_DESCRIPTION) is None :
         item_data[ITEM_DESCRIPTION] = ""
     if item_data.get(RESERVED_BY) is None :

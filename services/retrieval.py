@@ -43,9 +43,3 @@ def get_free_id(kind) :
             return ids[i - 1] + 1
     return ids[-1] + 1
 
-# def test_user_retrieval():
-#     print("Testing user_retrieval...")
-#     user_ids = get_all_user_ids()
-#     print("Retrieved User IDs:", user_ids)
-#     first_free_id = get_free_id()
-#     print("First free ID is:", first_free_id)

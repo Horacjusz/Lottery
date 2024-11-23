@@ -121,7 +121,9 @@ def load_settings():
     settings = {}
     try:
         query = datasession.query(Setting).all()
+        print(query)
         for setting in query:
+            print(setting)
             settings[setting.key] = setting.value
     except Exception as e:
         print(f"Error loading settings from database: {e}")

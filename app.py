@@ -4,6 +4,8 @@ from settings.settings import *
 from generation.generate_owner import generate_owner
 import os
 from services.database import initialize_db
+from settings.settings import DEFAULT_SETTINGS
+from services.file_service import save_settings
 
 from routes.auth_routes import auth_blueprint
 from routes.dashboard_routes import dashboard_blueprint
@@ -37,12 +39,14 @@ def home():
 def refresh_session():
     session.modified = True
 
+def prepare_app() :
+    initialize_db()
+    save_settings(DEFAULT_SETTINGS)
+    generate_owner()
+    
 
 if __name__ == "__main__":
-    initialize_db()
-    print("Database initialized successfully.")
-    
-    generate_owner()
+    prepare_app()
     
     # port = int(os.environ.get("PORT", 5000))
     # app.run(host='0.0.0.0', port=port)

@@ -1,7 +1,7 @@
 from services.retrieval import get_free_id, get_all_ids
 from services.file_service import save_user_file, load_user_file
 from settings.tokens import *
-from settings.settings import USERS_PATH, DEFAULT_PASSWORD
+from settings.settings import DEFAULT_PASSWORD, FAKER
 import os
 from faker import Faker
 from services.database import datasession
@@ -39,11 +39,9 @@ def create_user(user_data = None) :
     if user_data.get(USER_ID) is None :
         user_data[USER_ID] = get_free_id(USERS)
     if user_data.get(NAME) is None :
-        from generation.generate import faker
-        user_data[NAME] = faker.name()
+        user_data[NAME] = FAKER.name()
     if user_data.get(USERNAME) is None :
-        from generation.generate import faker
-        user_data[USERNAME] = f"user_{user_data[USER_ID]}" # faker.user_name()
+        user_data[USERNAME] = f"user_{user_data[USER_ID]}"
     if user_data.get(PASSWORD) is None :
         user_data[PASSWORD] = DEFAULT_PASSWORD
     if user_data.get(VISIBLE) is None :
