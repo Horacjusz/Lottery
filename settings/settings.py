@@ -22,49 +22,5 @@ DEFAULT_SETTINGS = {
 if not os.path.exists(CONFIG_PATH):
     with open(CONFIG_PATH, "w") as file:
         json.dump(DEFAULT_SETTINGS, file, indent=4)
-
-
-# Load settings from the config.json file
-def load_settings():
-    try:
-        if not os.path.exists(CONFIG_PATH):
-            # If config.json does not exist, create it with default settings
-            save_settings(DEFAULT_SETTINGS)
-        with open(CONFIG_PATH, 'r') as file:
-            return json.load(file)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        print(f"Error loading settings: {e}, returning DEFAULT_SETTINGS")
-        return DEFAULT_SETTINGS
-
-# Save settings to the config.json file
-def save_settings(data):
-    if not isinstance(data, dict):
-        raise ValueError("Data must be a dictionary.")
-    with open(CONFIG_PATH, 'w') as file:
-        json.dump(data, file, indent=4)
-
-def test_settings() :
-    # Test the settings module
-    print("Project Path:", PROJECT_PATH)
-
-    # Load settings
-    settings = load_settings()
-    print("Loaded Settings:", settings)
-
-    # Save new settings
-    new_data = {**settings, "LOTTERY_ACTIVE": True}  # Toggle LOTTERY_ACTIVE
-    save_settings(new_data)
-    print("Settings saved!")
-
-    # Reload settings
-    settings = load_settings()
-    print("Reloaded Settings:", settings)
-
-    # Save new settings
-    new_data = {**settings, "LOTTERY_ACTIVE": False}  # Toggle LOTTERY_ACTIVE
-    save_settings(new_data)
-    print("Settings saved!")
-
-    # Reload settings
-    settings = load_settings()
-    print("Reloaded Settings:", settings)
+        
+from services.file_service import load_settings, save_settings

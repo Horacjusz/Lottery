@@ -40,7 +40,7 @@
 <p>
     <label for="password-{{ user_id }}"><strong>Hasło:</strong>{% if edit_mode and not admin %}<br>Jeśli nie chcesz go zmieniać, nic nie rób{% endif %}</label>
     <input 
-        type="{% if admin %}text{% else %}password{% endif %}" 
+        type="password" 
         id="password-{{ user_id }}" 
         name="password" 
         {% if not admin %}required{% endif %} 

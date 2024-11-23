@@ -5,6 +5,7 @@ from settings.settings import USERS_PATH, DATA_PATH
 from services.retrieval import user_file_path
 from services.retrieval import item_file_path
 from settings.tokens import *
+from settings.settings import CONFIG_PATH, DEFAULT_SETTINGS
 
 def save_user_file(user_data):
     save_json_file(user_file_path(user_data[USER_ID]), user_data)
@@ -26,10 +27,19 @@ def delete_item_file(item_id):
     delete_json_file(item_file_path(item_id))
     
     
+# Load settings from the config.json file
+def load_settings():
+    return load_json_file(CONFIG_PATH)
+
+# Save settings to the config.json file
+def save_settings(data):
+    if not os.path.exists(CONFIG_PATH):
+        save_settings(DEFAULT_SETTINGS)
+    save_json_file(CONFIG_PATH, data)
+    
 def load_json_file(file_path) :
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File {file_path} does not exist.")
-    
     with open(file_path, 'r') as file:
         try:
             return json.load(file) 
@@ -57,9 +67,6 @@ def delete_file(path) :
         shutil.rmtree(path)  # Remove directory and its contents
 
 def delete_json_file(file_path) :
-    # if not os.path.exists(file_path):
-    #     raise FileNotFoundError(f"File {file_path} does not exist.")
-    # os.remove(file_path)
     delete_file(file_path)
 
 # Clear the data directory
@@ -74,7 +81,3 @@ def clear_directory(dirname):
         item_path = os.path.join(dirname, item)
         delete_file(item_path)
     print(f"Cleared all contents of the data directory: {DATA_PATH}")
-
-def test_file_service():
-    pass
-

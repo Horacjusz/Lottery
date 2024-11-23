@@ -36,7 +36,6 @@ function submitDrawForm(user_id) {
 }
 
 function toggleLotteryActive(event) {
-    console.log("Toggling lottery");
 
     event.preventDefault();
 
@@ -49,7 +48,7 @@ function toggleLotteryActive(event) {
         },
     })
     .then(response => {
-        if (!response.success) {
+        if (!response.ok) {
             throw new Error("Failed to toggle lottery status.");
         }
         return response.json();
