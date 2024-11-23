@@ -54,7 +54,6 @@ def delete_item(item_id) :
     save_user_file(user_data)
     unreserve_item(item_id)
     delete_item_file(item_id)
-    print(f"Item {item_id} has been deleted")
     return True
 
 def edit_item(item_id, new_name=None, new_description=None) :

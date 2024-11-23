@@ -153,7 +153,7 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
                         <tr class="reserved-item" data-item-id="${item_id}">
                             <td>
                                 <span class="item-name">${data.item.item_name}</span>
-                                <span class="item-description">${linkify(item.item_description)}</span>
+                                <span class="item-description">${linkify(data.item.item_description)}</span>
                             </td>
                             <td>
                                 <span class="remove-icon" onclick="unreserveItem(event, '${item_id}')">×</span>
@@ -163,8 +163,10 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
                             </td>
                         </tr>
                     `;
+                    console.log("user_id")
                     reservedTableBody.insertAdjacentHTML("beforeend", reservedRow);
 
+                    console.log("user_id")
                     // Hide "no reserved items" message if there are items now
                     const noReservedItemsMessage = document.getElementById("no-reserved-items");
                     if (noReservedItemsMessage) {
