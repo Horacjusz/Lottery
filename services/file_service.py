@@ -1,15 +1,6 @@
-import os
-import json
-import shutil
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from models.models import User, Item, Setting
-from settings.settings import DATABASE_URL
 from services.database import datasession
-
-from settings.settings import USERS_PATH, DATA_PATH
 from settings.tokens import *
-from settings.settings import CONFIG_PATH, DEFAULT_SETTINGS
 
 def save_user_file(user_data):
     user = datasession.query(User).filter_by(user_id=user_data[USER_ID]).first()
@@ -33,7 +24,6 @@ def save_user_file(user_data):
 def load_user_file(user_id):
     user = datasession.query(User).filter_by(user_id=user_id).first()
     if user:
-        # Convert the SQLAlchemy User object to a dictionary (JSON-like)
         return {
             USER_ID: user.user_id,
             NAME: user.name,
@@ -83,7 +73,6 @@ def save_item_file(item_data):
 def load_item_file(item_id):
     item = datasession.query(Item).filter_by(item_id=item_id).first()
     if item:
-        # Convert the SQLAlchemy Item object to a dictionary (JSON-like)
         return {
             ITEM_ID: item.item_id,
             ITEM_NAME: item.item_name,
@@ -140,56 +129,10 @@ def save_settings(data):
         for key, value in data.items():
             setting = datasession.query(Setting).filter_by(key=key).first()
             if setting:
-                setting.value = value  # Update existing setting
+                setting.value = value
             else:
-                setting = Setting(key=key, value=value)  # Create new setting
+                setting = Setting(key=key, value=value)
                 datasession.add(setting)
         datasession.commit()
     except Exception as e:
         print(f"Error saving settings to database: {e}")
-
-    
-# def load_json_file(file_path) :
-#     if not os.path.exists(file_path):
-#         raise FileNotFoundError(f"File {file_path} does not exist.")
-#     with open(file_path, 'r') as file:
-#         try:
-#             return json.load(file) 
-#         except json.JSONDecodeError:
-#             file.seek(0)
-#             return file.read()
-        
-# def save_json_file(file_path, content) :
-#     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-#     if isinstance(content, dict):
-#         with open(file_path, 'w') as file:
-#             json.dump(content, file, indent=4)
-#     elif isinstance(content, str):
-#         with open(file_path, 'w') as file:
-#             file.write(content)
-#     else:
-#         raise ValueError("User data must be a dictionary or a string.")
-
-# def delete_file(path) :
-#     if not os.path.exists(path):
-#         raise FileNotFoundError(f"File {path} does not exist.")
-#     if os.path.isfile(path) or os.path.islink(path):
-#         os.unlink(path)  # Remove file or symlink
-#     elif os.path.isdir(path):
-#         shutil.rmtree(path)  # Remove directory and its contents
-
-# def delete_json_file(file_path) :
-#     delete_file(file_path)
-
-# # Clear the data directory
-# def clear_directory(dirname):
-#     """
-#     Clear all contents of the data directory, including subdirectories and files.
-
-#     Returns:
-#         None
-#     """
-#     for item in os.listdir(dirname):
-#         item_path = os.path.join(dirname, item)
-#         delete_file(item_path)
-#     print(f"Cleared all contents of the data directory: {DATA_PATH}")

@@ -16,7 +16,6 @@ def kth_permutation_fast(elements, k):
     n = len(elements)
     k %= factorial(n)
     factorials = [factorial(i) for i in range(n)]
-    # elements = sorted(elements)
     used = [False] * n
     permutation = []
 

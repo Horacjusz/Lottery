@@ -1,8 +1,7 @@
 from services.file_service import load_settings
 from services.user_functions.user_draw import get_all_choosable, get_all_choosers, generate_valid_assignment
 from services.user_functions.user_service import assign, check_user_existence
-from services.file_service import load_user_file, save_user_file
-from random import shuffle as random_shuffle
+from services.file_service import load_user_file
 from settings.tokens import *
 
 def main_draw(user_id) :

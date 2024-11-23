@@ -20,9 +20,9 @@
     </tbody>
 </table>
 
-<form id="wishlist-form-{{ user.user_ID }}">
+<form id="wishlist-form-{{ user.user_ID }}" onsubmit="addItem({{ user.user_ID }})">
     <h4>Dodaj przedmiot</h4>
     <input type="text" id="wishlist_item-{{ user.user_ID }}" name="wishlist_item" placeholder="Nazwa przedmiotu" required>
     <input type="text" id="wishlist_description-{{ user.user_ID }}" name="wishlist_description" placeholder="Opis przedmiotu">
-    <button type="button" onclick="addItem({{ user.user_ID }})">Dodaj przedmiot</button>
+    <button type="submit">Dodaj przedmiot</button>
 </form>

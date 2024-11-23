@@ -1,20 +1,8 @@
-import os
-from settings.settings import USERS_PATH, ITEMS_PATH
 from settings.tokens import *
 from models.models import User, Item
 from services.file_service import datasession
 
 def get_all_ids(kind, include_zero=False):
-    """
-    Get all IDs from the database for the specified kind (USERS or ITEMS).
-    
-    Args:
-        kind (str): The type of objects to query ('USERS' or 'ITEMS').
-        include_zero (bool): Whether to include ID 0 in the results.
-
-    Returns:
-        list: A sorted list of IDs.
-    """
     ids = []
     try:
         if kind == USERS:
@@ -24,10 +12,8 @@ def get_all_ids(kind, include_zero=False):
         else:
             raise ValueError("Invalid kind specified. Must be USERS or ITEMS.")
         
-        # Fetch all IDs
         ids = [row[0] for row in query.all()]
         
-        # Filter out zero if include_zero is False
         if not include_zero:
             ids = [id for id in ids if id != 0]
     except Exception as e:

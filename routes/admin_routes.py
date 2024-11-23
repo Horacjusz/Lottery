@@ -14,7 +14,6 @@ def admin_dashboard():
     if USERNAME in session and session.get(ADMIN):
         user_id = session[USER_ID]
         visible = is_visible(user_id)
-        # users = get_all_users()  # Assuming this function returns a list of user objects
         users_data = get_all_users()
         items_data = get_all_items()
         return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), users_data = users_data, items_data = items_data, error_message = "")
@@ -25,12 +24,8 @@ def admin_dashboard():
 
 @admin_blueprint.route("/toggle_lottery", methods=["POST"])
 def toggle_lottery():
-    """Toggle the LOTTERY_ACTIVE setting."""
-    print("Toggling lottery...")
-
-    settings = load_settings()  # Load current settings
-    print(settings)
-    settings["LOTTERY_ACTIVE"] = not settings["LOTTERY_ACTIVE"]  # Toggle the value
-    save_settings(settings)  # Save updated settings
+    settings = load_settings()
+    settings["LOTTERY_ACTIVE"] = not settings["LOTTERY_ACTIVE"]
+    save_settings(settings)
 
     return jsonify({"success": True, "LOTTERY_ACTIVE": settings["LOTTERY_ACTIVE"]})
