@@ -19,8 +19,6 @@ app.secret_key = 'your_secret_key'  # Set your secret key here
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes = 5)
 app.config["SESSION_PERMANENT"] = True
 
-from flask_cors import CORS
-print(CORS(user_blueprint))  # lub CORS(user_blueprint) w Twoim kodzie
 app.register_blueprint(item_blueprint, url_prefix="/items")
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(dashboard_blueprint)
