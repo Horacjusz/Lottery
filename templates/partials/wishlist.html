@@ -1,11 +1,16 @@
 <table class="wishlist-table" id="wishlist-{{ assignment.user_ID }}">
     <tbody>
-        {% set number = 0 %}
+        {% set items_to_display = [] %}
         {% for item_id in assignment.wishlist %}
             {% set item = items_data[item_id] %}
             {% if item.reserved_by is none %}
-                {% set number = number + 1 %}
-                <tr data-item-id="{{ item_id }}" data-item="{{ item_id }}">
+                {% set _ = items_to_display.append(item) %}
+            {% endif %}
+        {% endfor %}
+        
+        {% if items_to_display %}
+            {% for item in items_to_display %}
+                <tr data-item-id="{{ item.item_id }}" data-item="{{ item.item_id }}">
                     <td>
                         <span class="item-name">{{ item.item_name }}</span>
                         <span class="item-description">{{ item.item_description | linkify | safe }}</span>
@@ -14,12 +19,11 @@
                         <span class="approve-icon" onclick="reserveItem(event, {{ user_id }}, {{ item.item_id }}, {{ on_dashboard | default('false') | lower }})">✔</span>
                     </td>
                 </tr>
-            {% endif %}
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2" style="text-align: center;">Nic tu jeszcze nie ma</td>
+            </tr>
+        {% endif %}
     </tbody>
-    {% if number == 0 %}
-        <p>
-            Nic tu jeszcze nie ma
-        </p>
-    {% endif %}
 </table>

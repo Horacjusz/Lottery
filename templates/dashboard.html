@@ -17,25 +17,27 @@
 
         <div class="section">
             <h3>Losowanie</h3>
-            {% if user.assignment is none %}
-                <p id="assignment-{{ user_id }}">
-                    Musisz kogoś wylosować
-                </p>
-            {% else %}
-                {% set assignment = users_data[user.assignment] %}
-                
-                <!-- If an assignment exists, display the assigned user's information in a two-column table -->
-                <div class="assigned-user-info">
-                    <p>
-                        <strong>Wylosowano:</strong>
-
-                        <!-- Assignment Display -->
-                        <p id="assignment-{{ user_id }}">
-                            {{ assignment.name }}
-                        </p>
+            {% if user.choosable %}
+                {% if user.assignment is none %}
+                    <p id="assignment-{{ user_id }}">
+                        Musisz kogoś wylosować
                     </p>
-                    {% include 'partials/wishlist.html' %}
-                </div>
+                {% else %}
+                    {% set assignment = users_data[user.assignment] %}
+                    
+                    <!-- If an assignment exists, display the assigned user's information in a two-column table -->
+                    <div class="assigned-user-info">
+                        <p>
+                            <strong>Wylosowano:</strong>
+
+                            <!-- Assignment Display -->
+                            <p id="assignment-{{ user_id }}", class = "user-name">
+                                {{ assignment.name }}
+                            </p>
+                        </p>
+                        {% include 'partials/wishlist.html' %}
+                    </div>
+                {% endif %}
             {% endif %}
             {% include 'partials/draw_button.html' %}
         </div>
@@ -75,7 +77,7 @@
 
         <p>Jeśli chcesz z jakiegoś powodu usunąć swoje konto skontaktuj się z administratorem</p>
 
-        {% if admin %}
+        {% if user.admin %}
             <div class="section">
                 <a href="{{ url_for('admin.admin_dashboard') }}" class="dashboard-link">Panel Administratora</a>
             </div>

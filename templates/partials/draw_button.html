@@ -1,7 +1,9 @@
 <form id="draw-form-{{ user_id }}" method="post" action="{{ url_for('draw.draw_assignment', user_id=user_id) }}">
     <button type="button" onclick="submitDrawForm({{ user_id }})"
         {% if not settings.LOTTERY_ACTIVE or (user.assignment is not none and not admin)%}disabled{% endif %}>
-        {% if not settings.LOTTERY_ACTIVE %}
+        {% if not user.choosable %}
+            Zrezygnowałeś z udziału w losowaniu - możesz to zmienić edytując swoje dane
+        {% elif not settings.LOTTERY_ACTIVE %}
             Losowanie niedostępne - skontaktuj się z administratorem
         {% elif user.assignment is not none and not admin %}
             W celu ponownego losowania skontaktuj się z administratorem

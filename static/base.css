@@ -51,7 +51,7 @@ body {
 }
 
 /* === NAGŁÓWKI === */
-.login-container h2, .dashboard-container h2, .register-container h2, .verify-password-container h2 {
+.login-container h2, .dashboard-container h2, .register-container h2, .verify-password-container .username-container h2 {
     color: #333;
     margin-bottom: 20px;
 }
@@ -105,6 +105,12 @@ a.back-link:hover {
     color: red;
     font-size: 0.85em;
     margin-top: 5px;
+}
+
+.user-name {
+    font-size: 20px;
+    color: #3e9b3e;
+    font-weight: bold;
 }
 
 .error {
