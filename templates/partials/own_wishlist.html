@@ -1,4 +1,4 @@
-<table class="wishlist-table" id="own-wishlist-table">
+<table class="wishlist-table" id="own-wishlist-table-{{ user_id }}">
     <tbody>
         {% for item_id in wishlist %}
             {% set item = items_data[item_id] %}
@@ -24,5 +24,5 @@
     <h4>Dodaj przedmiot</h4>
     <input type="text" id="wishlist_item-{{ user.user_ID }}" name="wishlist_item" placeholder="Nazwa przedmiotu" required>
     <input type="text" id="wishlist_description-{{ user.user_ID }}" name="wishlist_description" placeholder="Opis przedmiotu">
-    <button type="button" onclick="addItem('{{ user.user_ID }}')">Dodaj przedmiot</button>
+    <button type="button" onclick="addItem({{ user.user_ID }})">Dodaj przedmiot</button>
 </form>

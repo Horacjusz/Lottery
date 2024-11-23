@@ -117,7 +117,7 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
         .then((data) => {
             if (data.success) {
                 // Correctly remove the item from the wishlist
-                const wishlistRow = document.querySelector(`#wishlist-${data.owner_id} tr[data-item-id="${item_id}"]`);
+                const wishlistRow = document.querySelector(`#wishlist- tr[data-item-id="${item_id}"]`);
                 console.log(wishlistRow);
                 if (wishlistRow) {
                     wishlistRow.remove();
@@ -348,7 +348,6 @@ function removeItem(event, item_id) {
 
 
 function addItem(owner_id) {
-    console.log("Adding item");
     const itemInput = document.getElementById(`wishlist_item-${owner_id}`);
     const descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
 
@@ -396,7 +395,7 @@ function addItem(owner_id) {
 
 
 function updateWishlist(owner_id, item) {
-    const wishlistTable = document.getElementById("wishlist-table");
+    const wishlistTable = document.getElementById(`own-wishlist-table-${owner_id}`);
     const newRow = document.createElement("tr");
     newRow.setAttribute("data-item-id", item.item_id);
 

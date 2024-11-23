@@ -2,9 +2,11 @@
     <button type="button" onclick="submitDrawForm({{ user_id }})"
         {% if not settings.LOTTERY_ACTIVE or (user.assignment is not none and not admin)%}disabled{% endif %}>
         {% if not settings.LOTTERY_ACTIVE %}
-            Losowanie niedostępne
+            Losowanie niedostępne - skontaktuj się z administratorem
         {% elif user.assignment is not none and not admin %}
             W celu ponownego losowania skontaktuj się z administratorem
+        {% elif not user.choosable %}
+            Zrezygnowałeś z udziału w losowaniu - możesz to zmienić edytując swoje dane
         {% else %}
             Losuj
         {% endif %}
