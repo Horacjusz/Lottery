@@ -1,108 +1,107 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
-</head>
-<body>
-    <div class="admin-dashboard">
-        <h2>Admin Dashboard</h2>
-    
-        <div class="settings">
-            <h3>Settings</h3>
-            <div class="lottery-status">
-                <!-- <p>LOTTERY_ACTIVE:</p> -->
-                <button id="lottery-toggle-btn"
-                    class="lottery-btn {{ 'lottery-enabled' if settings.LOTTERY_ACTIVE else 'lottery-disabled' }}"
-                    onclick="toggleLotteryActive(event)">
-                    {{ 'Lottery enabled' if settings.LOTTERY_ACTIVE else 'Lottery disabled' }}
-                </button>
-                <p id="lottery-status">
-                    Current status: {{ 'Enabled' if settings.LOTTERY_ACTIVE else 'Disabled' }}
-                </p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin dashboard</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+        <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="admin-dashboard">
+            <h2>Admin Dashboard</h2>
+            <div class="settings">
+                <h3>Settings</h3>
+                <div class="lottery-status">
+                    <!-- <p>LOTTERY_ACTIVE:</p> -->
+                    <button id="lottery-toggle-btn"
+                        class="lottery-btn {{ 'lottery-enabled' if settings.LOTTERY_ACTIVE else 'lottery-disabled' }}"
+                        onclick="toggleLotteryActive(event)">
+                        {{ 'Lottery enabled' if settings.LOTTERY_ACTIVE else 'Lottery disabled' }}
+                    </button>
+                    <p id="lottery-status">
+                        Current status: {{ 'Enabled' if settings.LOTTERY_ACTIVE else 'Disabled' }}
+                    </p>
+                </div>
             </div>
-        </div>
-        {% set admin = true %}
-        {% set edit_mode = false %}
-        <div class="users-section">
-            <p><strong>User list</strong></p>
-            <button class="collapsible main-collapsible">Show</button>
-            <div class="users-list content">
-                <ul>
-                    {% for user_id in users_data %}
-                        {% set user = users_data[user_id] %}
-                        <li class="user-item">
-                            <div class="user-header">
-                                <span class="user-text">{{ user.name }} ({{ user.username }})</span>
-                                <button class="collapsible user-collapsible">+</button>
-                            </div>
-                            <div class="content user-content"><p><strong>ID:</strong> {{ user_id }}</p>
-                                <p>
-                                    <strong>Assignment:</strong></strong>
-
-                                    <!-- Assignment Display -->
-                                    <p id="assignment-{{ user_id }}">
-                                        {{ user.assignment }}
-                                        {% if user.assignment is not none %}
-                                            -> {{ users_data[user.assignment].name }}
-                                        {% endif %}
-                                    </p>      
-
-                                    <!-- Draw Form -->
-                                    {% include 'partials/draw_button.html' %}
-
-                                </p>
-                                <form id="update-user-form-{{ user_id }}" method="post">
-
-                                    {% include 'partials/basic_user_changes.html' %}
-
+            {% set admin = true %}
+            {% set edit_mode = true %}
+            <div class="users-section">
+                <p><strong>User list</strong></p>
+                <button class="collapsible main-collapsible">Show</button>
+                <div class="users-list content">
+                    <ul>
+                        {% for user_id in users_data %}
+                            {% set user = users_data[user_id] %}
+                            <li class="user-item">
+                                <div class="user-header">
+                                    <span class="user-text">{{ user.name }} ({{ user.username }})</span>
+                                    <button class="collapsible user-collapsible">+</button>
+                                </div>
+                                <div class="content user-content"><p><strong>ID:</strong> {{ user_id }}</p>
                                     <p>
-                                        <strong>Admin:</strong>
-                                        <input 
-                                            type="checkbox" 
-                                            id="admin-{{ user_id }}" 
-                                            name="admin" 
-                                            value="true" 
-                                            {% if user.admin %}checked{% endif %}
-                                        >
+                                        <strong>Assignment:</strong></strong>
+
+                                        <!-- Assignment Display -->
+                                        <p id="assignment-{{ user_id }}">
+                                            {{ user.assignment }}
+                                            {% if user.assignment is not none %}
+                                                -> {{ users_data[user.assignment].name }}
+                                            {% endif %}
+                                        </p>      
+
+                                        <!-- Draw Form -->
+                                        {% include 'partials/draw_button.html' %}
+
+                                    </p>
+                                    <form id="update-user-form-{{ user_id }}" method="post">
+
+                                        {% include 'partials/basic_user_changes.html' %}
+
+                                        <p>
+                                            <strong>Admin:</strong>
+                                            <input 
+                                                type="checkbox" 
+                                                id="admin-{{ user_id }}" 
+                                                name="admin" 
+                                                value="true" 
+                                                {% if user.admin %}checked{% endif %}
+                                            >
+                                        </p>
+                                        <p>
+                                            <strong>Visible:</strong>
+                                            <input 
+                                                type="checkbox"
+                                                id="visible-{{ user_id }}"
+                                                name="visible"
+                                                value="true"
+                                                {% if user.visible %}checked{% endif %}
+                                                {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}
+                                            >
+                                        </p>
+                                        <button type="button" onclick="updateUser(event, {{ user_id }})">Save</button>
+                                    </form>                                
+                                    <p>
+                                        <strong>Wishlist:</strong>
+                                        {% set wishlist = user.wishlist %}
+                                        {% include 'partials/own_wishlist.html' %}
+                                        <p id="no-items" style="display: none;">No items in the wishlist.</p>
                                     </p>
                                     <p>
-                                        <strong>Visible:</strong>
-                                        <input 
-                                            type="checkbox"
-                                            id="visible-{{ user_id }}"
-                                            name="visible"
-                                            value="true"
-                                            {% if user.visible %}checked{% endif %}
-                                            {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}
-                                        >
+                                        <strong>Reserved Items:</strong>
+                                        {% set reserved_items = user.reserved_items %}
+                                        {% include 'partials/reserved_items.html' %}
                                     </p>
-                                    <button type="button" onclick="updateUser(event, {{ user_id }})">Save</button>
-                                </form>                                
-                                <p>
-                                    <strong>Wishlist:</strong>
-                                    {% set wishlist = user.wishlist %}
-                                    {% include 'partials/own_wishlist.html' %}
-                                    <p id="no-items" style="display: none;">No items in the wishlist.</p>
-                                </p>
-                                <p>
-                                    <strong>Reserved Items:</strong>
-                                    {% set reserved_items = user.reserved_items %}
-                                    {% include 'partials/reserved_items.html' %}
-                                </p>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>
             </div>
         </div>
-
-        <div class="section">
-            <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>
-        </div>
-    </div>
-</body>
+    </body>
 </html>

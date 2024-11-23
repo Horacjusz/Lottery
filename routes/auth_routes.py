@@ -21,15 +21,24 @@ def login():
     if request.method == "POST":
         username = request.form[USERNAME]
         print(username)
-        password = request.form["password"]
+        password = request.form[PASSWORD]
         print(password)
-        user_id = get_id_from_username(username)
-        print(user_id)
+        
+        if USERNAME in session:
+            print("sesja", session)
+            flash("Twoja sesja wygasła. Zaloguj się ponownie.", "warning")
+            session.pop(USERNAME)
+            session.pop(ADMIN)
+            session.pop(USER_ID)
+            return redirect(url_for("auth.login"))
 
         if verify_user(username, password):
+            user_id = get_id_from_username(username)
+            print(user_id)
             session[USERNAME] = username
             session[USER_ID] = user_id
             session[ADMIN] = is_admin(user_id)
+            session.permanent = True  # Ustawienie sesji jako trwałej
             flash("Zalogowano pomyślnie!", "success")
 
             # Redirect to the appropriate dashboard
@@ -48,15 +57,26 @@ def logout():
     flash("Wylogowano pomyślnie!", "success")
     return redirect(url_for("auth.login"))
 
-# @auth_blueprint.route("/verify_password", methods=["GET", "POST"])
-# def verify_password() :
-#     if "username" not in session:
-#         flash("Musisz być zalogowany, aby edytować swoje dane.", "error")
-#         return redirect(url_for("auth.login"))
+@auth_blueprint.route("/verify_password", methods=["GET", "POST"])
+def verify_password() :
+    if "username" not in session:
+        flash("Musisz być zalogowany, aby edytować swoje dane.", "error")
+        return redirect(url_for("auth.login"))
     
+    if request.method != "POST" :
+        print()
+        return render_template("verify_password.html", error="")
     
-#     return render_template("verify_password.html", error="Nieprawidłowe hasło.")
-
-@auth_blueprint.route("/register")
-def register() :
-    return render_template("/register.html", settings = load_settings(), user = None, available_spouses = get_available_spouses(), users_data = get_all_users(), edit_mode = False, admin = False)
+    user_id = session[USER_ID]
+    
+    password = request.form[PASSWORD]
+    
+    user_data = load_user_file(user_id)
+    
+    user_password = user_data[PASSWORD]
+    
+    if password != user_password :
+        print("Wrong")
+        return render_template("verify_password.html", error="Nieprawidłowe hasło.")
+    
+    return render_template("register.html", user = user_data, settings = load_settings(), edit_mode = True, user_id = user_id, users_data = get_all_users())

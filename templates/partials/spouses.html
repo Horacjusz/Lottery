@@ -1,6 +1,5 @@
-<p><strong>Małżonek:</strong></p>
-<p>(jeśli Twojego nie ma na liście, pozostaw to pole puste):</p>
-<select name="spouse" id="spouse-{{ user.user_ID }}" {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}>
+<label for="spouse-{{ user_id }}"><strong>Małżonek:</strong><br>Jeśli Twojego nie ma na liście, pozostaw to pole puste</label>
+<select name="spouse" id="spouse-{{ user_id }}" {% if settings.LOTTERY_ACTIVE %}disabled{% endif %}>
     <option value="None" {% if user.spouse is none %}selected{% endif %}>Brak</option>
     {% for spouse_id in users_data %}
         {% set spouse = users_data[spouse_id] %}

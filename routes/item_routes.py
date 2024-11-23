@@ -3,6 +3,7 @@ from services.verification import is_visible
 from settings.settings import load_settings, save_settings
 from services.lists_service import get_available_spouses, get_all_users, get_all_items
 from services.item_functions.item_service import reserve_item, delete_item, edit_item, unreserve_item, toggle_buy_item, create_item
+from services.file_service import load_item_file
 from settings.tokens import *
 
 item_blueprint = Blueprint("item", __name__, template_folder="templates")
@@ -22,17 +23,53 @@ def remove_item_route(item_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@item_blueprint.route("/reserve/<int:user_id>/<int:item_id>", methods=["POST"])
+def reserve_item_route(user_id, item_id):
+    """Route to handle reserving an item."""
+    print(f"user {user_id} wants to reserve item {item_id}")
+    try:
+        reserved_item = reserve_item(user_id, item_id)# Call the service function to reserve the item
+        if reserved_item:
+            return jsonify({
+                "success": True,
+                "owner_id" : reserved_item[OWNER_ID],
+                "item": {
+                    "item_name": reserved_item["item_name"],
+                    "item_description": reserved_item["item_description"],
+                },
+                "message": "Item reserved successfully."
+            })
+        else:
+            return jsonify({"success": False, "message": "Failed to reserve item."}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+
 @item_blueprint.route("/unreserve/<int:item_id>", methods=["POST"])
 def unreserve_item_route(item_id):
     """Route to handle unreserving an item."""
     try:
-        success = unreserve_item(item_id)  # Call the service function to unreserve the item
-        if success:
-            return jsonify({"success": True, "message": "Item unreserved successfully."})
+        # Fetch user_id before unreserving
+        user_id = load_item_file(item_id)[RESERVED_BY]
+
+        # Unreserve the item
+        unreserved_item = unreserve_item(item_id)
+        if unreserved_item:
+            return jsonify({
+                "success": True,
+                "user_id": user_id,
+                "item": {
+                    "item_name": unreserved_item["item_name"],
+                    "item_description": unreserved_item["item_description"],
+                },
+                "message": "Item unreserved successfully."
+            })
         else:
             return jsonify({"success": False, "message": "Failed to unreserve item."}), 400
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
 
 
 @item_blueprint.route("/edit/<int:item_id>", methods=["POST"])

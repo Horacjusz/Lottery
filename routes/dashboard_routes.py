@@ -1,7 +1,7 @@
 from flask import session, flash, redirect, url_for, render_template, Blueprint
 from settings.settings import load_settings
 from services.file_service import load_user_file
-from services.lists_service import get_all_items
+from services.lists_service import get_all_items, get_all_users
 from settings.tokens import *
 
 
@@ -15,10 +15,13 @@ def dashboard():
 
     user_id = session[USER_ID]
     user_data = load_user_file(user_id)
-    items_data = get_all_items()
 
     if user_data is None:
         flash("Nie znaleziono danych użytkownika. Proszę spróbować ponownie.", "error")
         return redirect(url_for("auth.logout"))
 
-    return render_template("dashboard.html", user = user_data, settings = load_settings(), items_data = items_data)
+    return render_template("dashboard.html", 
+                           user = user_data, 
+                           settings = load_settings(), 
+                           items_data = get_all_items(), 
+                           users_data = get_all_users())

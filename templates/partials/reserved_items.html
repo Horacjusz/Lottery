@@ -1,4 +1,4 @@
-<table class="wishlist-table" id="reserved-table">
+<table class="wishlist-table" id="reserved-table-{{ user_id }}">
     <tbody>
         {% for item_id in reserved_items %}
             {% set item = items_data[item_id] %}
@@ -9,7 +9,7 @@
                     <span class="item-owner">{{ item.owner_name }}</span>
                 </td>
                 <td>
-                    <span class="edit-icon" onclick="unreserveItem(event, '{{ item_id }}')">×</span>
+                    <span id = 'reserved-table-{{ item_id }}-accept' class="{% if item.bought %}edit-icon{% else %}remove-icon{% endif %}" onclick="unreserveItem(event, '{{ item_id }}')">×</span>
                 </td>
                 <td>
                     <span class="edit-icon" onclick="toggleBought(event, '{{ item_id }}')">💲</span>

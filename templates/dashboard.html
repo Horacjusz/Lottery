@@ -10,31 +10,34 @@
 <body>
     <div class="dashboard-container">
         {% set admin = false %}
+        {% set on_dashboard = true %}
+        {% set user_id = user.user_ID %}
         <h2>Witaj, {{ user.name }}!</h2>
         <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.</p>
 
         <div class="section">
             <h3>Losowanie</h3>
-
-            {% if user.assignment is not none %}
-                {% set assignment = user.assignment %}
+            {% if user.assignment is none %}
+                <p id="assignment-{{ user_id }}">
+                    Musisz kogoś wylosować
+                </p>
+            {% else %}
+                {% set assignment = users_data[user.assignment] %}
+                
                 <!-- If an assignment exists, display the assigned user's information in a two-column table -->
                 <div class="assigned-user-info">
-                    <p>Wylosowałeś: <strong>{{ assignment.name }}</strong></p>
-                    <h4>Lista życzeń:</h4>
+                    <p>
+                        <strong>Wylosowano:</strong>
+
+                        <!-- Assignment Display -->
+                        <p id="assignment-{{ user_id }}">
+                            {{ assignment.name }}
+                        </p>
+                    </p>
                     {% include 'partials/wishlist.html' %}
-                    
-                    <!-- Placeholder for Empty message, hidden by default -->
-                    <p id="empty-message" style="display: none;">Nic tu nie ma ¯\\_(ツ)_/¯</p>
                 </div>
-                
-            {% elif not user.choosable %}
-                <!-- If choosable is False and assignment is None, display a message -->
-                <p>Ty nie losujesz</p>
-            {% else %}
-                <!-- If assignment is None and choosable is True, display the draw button -->
-                {% include 'partials/draw_button.html' %}
             {% endif %}
+            {% include 'partials/draw_button.html' %}
         </div>
         
         <div class="section">
@@ -46,9 +49,9 @@
         </div>
 
 
-        {# <div class="section">
+        <div class="section">
             <a href="{{ url_for('user.user_list') }}" class="dashboard-link">Lista Użytkowników</a>
-        </div> #}
+        </div>
 
         <div class="section">
             <h3>Twoja lista życzeń:</h3>
@@ -62,9 +65,9 @@
 
 
 
-        {# <div class="section">
+        <div class="section">
             <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
-        </div> #}
+        </div>
 
         <div class="section">
             <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Wyloguj się</a>

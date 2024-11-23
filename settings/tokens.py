@@ -26,3 +26,6 @@ USERS = "users"
 
 # Global tokens
 LOTTERY_ACTIVE = "LOTTERY_ACTIVE"
+
+# Globals
+OWNER_USERNAME = "master"

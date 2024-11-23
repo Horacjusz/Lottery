@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ 'Edycja danych użytkownika' if edit_mode else 'Rejestracja' }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+        <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="register-container">
+            <h2>{{ 'Edycja danych użytkownika' if edit_mode else 'Rejestracja' }}</h2>
+            {% if error %}
+                <p id = "error" class="error-message">{{ error }}</p>
+            {% endif %}
+            <form onsubmit="updateUser(event, '{{ user_id if edit_mode else 'new' }}'), false" method="POST">
+                
+                {% set user_spouse = none %}
+                {% include 'partials/basic_user_changes.html' %}
+
+                <p>
+                    <label for="confirm_password-{{ user_id }}"><strong>Potwierdź hasło</strong>{% if edit_mode %} (może pozostać puste){% endif %}:</label>
+                    <input type="password" id="confirm_password-{{ user_id }}" name="password" value = "{{ user.password | default('') }}" {% if admin %}disabled{% endif %}>
+                </p>
+
+
+                <button type="submit">{{ 'Zapisz zmiany' if edit_mode else 'Zarejestruj' }}</button>
+            </form>
+            
+            {% if edit_mode %}
+                <a href="{{ url_for('dashboard.dashboard') }}" class="return-link">Wróć do panelu</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="return-link">Wróć do logowania</a>
+            {% endif %}
+        </div>
+        <div id="error" class="error-message"></div>
+    </body>
+</html>

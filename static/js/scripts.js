@@ -21,7 +21,7 @@ function submitDrawForm(user_id) {
         if (data.success) {
             const assignmentElement = document.getElementById(`assignment-${user_id}`);
             if (data.assignment) {
-                assignmentElement.innerHTML = `${data.assignment} -> ${data.assignment_name || "Unknown Name"}`;
+                assignmentElement.innerHTML = `${data.assignment_name || "Unknown Name"} -> Odśwież, aby zobaczyć listę prezentową`;
             } else {
                 assignmentElement.textContent = "No assignment available.";
             }
@@ -81,9 +81,6 @@ function toggleLotteryActive(event) {
 }
 
 
-
-
-
 document.addEventListener("DOMContentLoaded", function() {
     // Toggle for the main user list
     const mainCollapsible = document.querySelector(".main-collapsible");
@@ -105,7 +102,69 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function unreserveItem(event, item_id) {
+
+function reserveItem(event, user_id, item_id, on_dashboard) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    fetch(`/items/reserve/${user_id}/${item_id}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                // Correctly remove the item from the wishlist
+                const wishlistRow = document.querySelector(`#wishlist-${data.owner_id} tr[data-item-id="${item_id}"]`);
+                console.log(wishlistRow);
+                if (wishlistRow) {
+                    wishlistRow.remove();
+                }
+
+                // Add the item to the reserved table if on_dashboard is true
+                if (on_dashboard) {
+                    const reservedTableBody = document.querySelector(`#reserved-table-${user_id} tbody`);
+                    const reservedRow = `
+                        <tr class="reserved-item" data-item-id="${item_id}">
+                            <td>
+                                <span class="item-name">${data.item.item_name}</span>
+                                <span class="item-description">${data.item.item_description}</span>
+                            </td>
+                            <td>
+                                <span class="remove-icon" onclick="unreserveItem(event, '${item_id}')">×</span>
+                            </td>
+                            <td>
+                                <span class="edit-icon" onclick="toggleBought(event, '${item_id}')">💲</span>
+                            </td>
+                        </tr>
+                    `;
+                    reservedTableBody.insertAdjacentHTML("beforeend", reservedRow);
+
+                    // Hide "no reserved items" message if there are items now
+                    const noReservedItemsMessage = document.getElementById("no-reserved-items");
+                    if (noReservedItemsMessage) {
+                        noReservedItemsMessage.style.display = "none";
+                    }
+                }
+            } else {
+                alert(data.error || "Error reserving item.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while processing the reserve request.");
+        });
+}
+
+
+
+
+
+
+
+function unreserveItem(event, item_id, on_dashboard) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -118,14 +177,21 @@ function unreserveItem(event, item_id) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                const reservedRow = document.querySelector(`tr[data-item-id="${item_id}"]`);
+                const { user_id, item } = data;
+
+                // Remove the item from the reserved table
+                const reservedRow = document.querySelector(`#reserved-table-${user_id} tr[data-item-id="${item_id}"]`);
                 if (reservedRow) {
                     reservedRow.remove();
                 }
 
+                // Show "no reserved items" message if the reserved table is empty
+                const reservedTableBody = document.querySelector(`#reserved-table-${user_id} tbody`);
                 const noReservedItemsMessage = document.getElementById("no-reserved-items");
-                if (!document.querySelector("#reserved-table tbody tr")) {
+                if (!reservedTableBody || !reservedTableBody.querySelector("tr")) {
                     noReservedItemsMessage.style.display = "block";
+                } else {
+                    noReservedItemsMessage.style.display = "none";
                 }
             } else {
                 alert(data.error || "Error unreserving item.");
@@ -136,6 +202,8 @@ function unreserveItem(event, item_id) {
             alert("An error occurred while processing the unreserve request.");
         });
 }
+
+
 
 
 
@@ -161,6 +229,18 @@ function toggleBought(event, item_id) {
                         reservedRow.classList.remove("reserved-green");
                     }
                 }
+
+                // Update the cell style for the reserved status
+                const reservedCell = document.querySelector(`#reserved-table-${item_id}-accept`);
+                if (reservedCell) {
+                    if (data.bought) {
+                        reservedCell.classList.remove("remove-icon");
+                        reservedCell.classList.add("edit-icon");
+                    } else {
+                        reservedCell.classList.remove("edit-icon");
+                        reservedCell.classList.add("remove-icon");
+                    }
+                }
             } else {
                 alert(data.error || "Error toggling bought status.");
             }
@@ -170,9 +250,6 @@ function toggleBought(event, item_id) {
             alert("An error occurred while processing the request.");
         });
 }
-
-
-
 
 
 function editItem(event, item_id, itemName, itemDescription) {
@@ -344,45 +421,42 @@ function validatePasswords() {
     const confirmPassword = document.getElementById("confirm_password-new").value;
 
     if (password && password !== confirmPassword) {
-        document.getElementById("error").textContent = "Hasła nie są identyczne. Spróbuj ponownie.";
-        return false; // Prevent form submission
+        document.getElementById("error-message-password").textContent = "Hasła nie są identyczne. Spróbuj ponownie.";
+        return false;
     }
     return true;
 }
 
-function updateUser(event, user_id = null) {
+function updateUser(event, user_id = null, edit_mode = true) {
     event.preventDefault();
     event.stopPropagation();
 
-    const idSuffix = user_id || 'new';
-    const name = document.getElementById(`name-${idSuffix}`).value;
-    const username = document.getElementById(`username-${idSuffix}`).value;
-    const password = document.getElementById(`password-${idSuffix}`).value;
-    const choosable = document.getElementById(`choosable-${idSuffix}`)?.checked || false;
-    const admin = document.getElementById(`admin-${idSuffix}`)?.checked || false;
-    const visible = document.getElementById(`visible-${idSuffix}`)?.checked || true;
+    const name = document.getElementById(`name-${user_id}`)?.value || null;
+    const username = document.getElementById(`username-${user_id}`)?.value || null;
+    const password = document.getElementById(`password-${user_id}`)?.value || null;
+    const confirmPassword = document.getElementById(`confirm_password-${user_id}`)?.value || null;
+    const choosable = document.getElementById(`choosable-${user_id}`)?.checked || false;
+    const admin = document.getElementById(`admin-${user_id}`)?.checked || false;
+    const visible = document.getElementById(`visible-${user_id}`)?.checked || true;
 
-    const spouseElement = document.querySelector(`#spouse-${idSuffix}`);
+    const spouseElement = document.querySelector(`#spouse-${user_id}`);
     const spouse = spouseElement ? spouseElement.value : null;
+    
+    if (user_id == 'new') {user_id = null;}
 
-    const payload = {
-        new_spouse: spouse,
-        new_name: name,
-        new_username: username,
-        new_password: password,
-        new_choosable: choosable,
-        new_visible: visible,
-        new_admin: admin,
-    };
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        document.getElementById("error").textContent = "Hasła muszą być identyczne.";
+        return;
+    }
 
-    console.log("Payload being sent:", payload);
-
-    fetch(`/users/update/${user_id || ''}`, {
+    // Check if username is free
+    fetch(`/users/is_username_free?edit_mode=${edit_mode}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ username }),
     })
         .then((response) => {
             if (!response.ok) {
@@ -391,15 +465,54 @@ function updateUser(event, user_id = null) {
             return response.json();
         })
         .then((data) => {
-            if (data.success) {
-                const redirectUrl = edit_mode ? "/dashboard" : "/auth/login";
-                window.location.href = redirectUrl;
-            } else {
-                document.getElementById("error").textContent = data.error || "Failed to update user.";
+            if (!data.is_free) {
+                document.getElementById("error").textContent = "Nazwa użytkownika jest już zajęta.";
+                return;
             }
+
+            // Continue if username is free
+            const payload = {
+                user_id: user_id,
+                new_spouse: spouse,
+                new_name: name,
+                new_username: username,
+                new_password: password,
+                new_choosable: choosable,
+                new_visible: visible,
+                new_admin: admin,
+            };
+
+            const str = user_id ? `/${user_id}` : "";
+            fetch(`/users/update${str}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        const redirectUrl = edit_mode ? "/dashboard" : "/auth/login";
+                        window.location.href = redirectUrl;
+                    } else {
+                        document.getElementById("error").textContent =
+                            data.error || "Nie udało się zaktualizować użytkownika.";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error updating user:", error);
+                    document.getElementById("error").textContent =
+                        "Wystąpił błąd podczas aktualizacji użytkownika.";
+                });
         })
         .catch((error) => {
-            console.error("Error updating user:", error);
-            document.getElementById("error").textContent = "An error occurred while updating the user.";
+            console.error("Error checking username:", error);
+            document.getElementById("error").textContent = "Nazwa użytkownika jest już zajęta.";
         });
 }
