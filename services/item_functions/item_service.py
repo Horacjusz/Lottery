@@ -1,14 +1,27 @@
 from services.file_service import load_user_file, save_user_file, save_item_file, load_item_file, delete_item_file
 from services.user_functions.user_service import check_user_existence
 from settings.tokens import *
-from services.retrieval import item_file_path, get_free_id
+from services.retrieval import get_free_id
+from services.database import datasession
+from models.models import Item
 import os
 
 def check_item_existence(item_id):
-    if not os.path.exists(item_file_path(item_id)) :
-        print(f"Item with ID {item_id} haven't existed")
+    """
+    Check if an item exists in the database.
+
+    Args:
+        item_id (int): ID of the item to check.
+
+    Returns:
+        bool: True if the item exists, False otherwise.
+    """
+    item = datasession.query(Item).filter_by(item_id=item_id).first()
+    if not item:
+        print(f"Item with ID {item_id} does not exist.")
         return False
-    return True   
+    return True
+
 
 def create_item(owner_id, item_data = None) :
     if item_data is None :

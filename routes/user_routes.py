@@ -4,7 +4,7 @@ from services.file_service import load_user_file
 from settings.tokens import *
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from services.user_functions.user_service import create_user  # Assuming create_user function exists
-from settings.settings import load_settings  # Adjust import paths as needed
+from services.file_service import load_settings  # Adjust import paths as needed
 from services.lists_service import get_available_spouses, get_all_users, get_all_items
 
 user_blueprint = Blueprint("user", __name__, template_folder="templates")

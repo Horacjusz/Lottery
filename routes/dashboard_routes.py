@@ -1,5 +1,5 @@
 from flask import session, flash, redirect, url_for, render_template, Blueprint
-from settings.settings import load_settings
+from services.file_service import load_settings
 from services.file_service import load_user_file
 from services.lists_service import get_all_items, get_all_users
 from settings.tokens import *

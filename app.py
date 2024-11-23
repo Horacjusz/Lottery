@@ -3,6 +3,7 @@ from datetime import timedelta
 from settings.settings import *
 from generation.generate_owner import generate_owner
 import os
+from services.database import initialize_db
 
 from routes.auth_routes import auth_blueprint
 from routes.dashboard_routes import dashboard_blueprint
@@ -38,6 +39,8 @@ def refresh_session():
 
 
 if __name__ == "__main__":
+    initialize_db()
+    print("Database initialized successfully.")
     
     generate_owner()
     

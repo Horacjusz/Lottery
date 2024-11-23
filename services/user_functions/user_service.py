@@ -1,19 +1,37 @@
-from services.retrieval import get_free_id, user_file_path, get_all_ids
-from services.file_service import save_user_file, load_user_file, delete_user_file
+from services.retrieval import get_free_id, get_all_ids
+from services.file_service import save_user_file, load_user_file
 from settings.tokens import *
 from settings.settings import USERS_PATH, DEFAULT_PASSWORD
 import os
 from faker import Faker
+from services.database import datasession
+from models.models import User
 
 faker = Faker()
 
 
 def check_user_existence(user_id):
-    if user_id is None : return False
-    if not os.path.exists(user_file_path(user_id)) :
-        print(f"User with ID {user_id} does not exist")
+    """
+    Check if a user exists in the database by their ID.
+
+    Args:
+        user_id (int): The ID of the user to check.
+
+    Returns:
+        bool: True if the user exists, False otherwise.
+    """
+    if user_id is None:
         return False
-    return True
+    try:
+        user = datasession.query(User).filter_by(user_id=user_id).first()
+        if not user:
+            print(f"User with ID {user_id} does not exist.")
+            return False
+        return True
+    except Exception as e:
+        print(f"Error checking existence of user with ID {user_id}: {e}")
+        return False
+
 
 def create_user(user_data = None) :
     if user_data is None : 

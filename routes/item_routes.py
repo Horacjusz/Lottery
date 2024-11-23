@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request
 from services.verification import is_visible
-from settings.settings import load_settings, save_settings
+from services.file_service import load_settings, save_settings
 from services.lists_service import get_available_spouses, get_all_users, get_all_items
 from services.item_functions.item_service import reserve_item, delete_item, edit_item, unreserve_item, toggle_buy_item, create_item
 from services.file_service import load_item_file

@@ -1,6 +1,7 @@
 from settings.tokens import *
 from services.file_service import clear_directory, save_user_file, load_user_file
-from settings.settings import USERS_PATH, DEFAULT_PASSWORD, ITEMS_PATH, DATA_PATH, load_settings
+from settings.settings import USERS_PATH, DEFAULT_PASSWORD, ITEMS_PATH, DATA_PATH
+from services.file_service import load_settings
 from services.user_functions.user_service import create_user, print_user
 from services.item_functions.item_service import create_item
 from generation.generate_owner import generate_owner

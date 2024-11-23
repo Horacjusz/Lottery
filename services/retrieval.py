@@ -1,19 +1,38 @@
 import os
 from settings.settings import USERS_PATH, ITEMS_PATH
 from settings.tokens import *
+from models.models import User, Item
+from services.file_service import datasession
 
-def get_all_ids(kind, include_zero = False):
+def get_all_ids(kind, include_zero=False):
+    """
+    Get all IDs from the database for the specified kind (USERS or ITEMS).
+    
+    Args:
+        kind (str): The type of objects to query ('USERS' or 'ITEMS').
+        include_zero (bool): Whether to include ID 0 in the results.
+
+    Returns:
+        list: A sorted list of IDs.
+    """
     ids = []
-    path = USERS_PATH if kind == USERS else ITEMS_PATH if kind == ITEMS else None
     try:
-        for filename in os.listdir(path):
-            if (filename.startswith("user_") or filename.startswith("item_")) and filename.endswith(".json"):
-                this_id = filename[5:-5]
-                if this_id.isdigit():
-                    if int(this_id) == 0 and include_zero == False : continue
-                    ids.append(int(this_id))
-    except FileNotFoundError:
-        print(f"Directory {USERS_PATH} does not exist.")
+        if kind == USERS:
+            query = datasession.query(User.user_id)
+        elif kind == ITEMS:
+            query = datasession.query(Item.item_id)
+        else:
+            raise ValueError("Invalid kind specified. Must be USERS or ITEMS.")
+        
+        # Fetch all IDs
+        ids = [row[0] for row in query.all()]
+        
+        # Filter out zero if include_zero is False
+        if not include_zero:
+            ids = [id for id in ids if id != 0]
+    except Exception as e:
+        print(f"Error querying IDs from the database: {e}")
+    
     return sorted(ids)
 
 def get_free_id(kind) :
@@ -23,12 +42,6 @@ def get_free_id(kind) :
         if ids[i] - ids[i - 1] > 1 :
             return ids[i - 1] + 1
     return ids[-1] + 1
-
-def user_file_path(user_id) :
-    return os.path.join(USERS_PATH, f"user_{user_id}.json")
-
-def item_file_path(item_id) :
-    return os.path.join(ITEMS_PATH, f"item_{item_id}.json")
 
 # def test_user_retrieval():
 #     print("Testing user_retrieval...")

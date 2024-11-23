@@ -1,5 +1,7 @@
 import os
 import json
+from dotenv import load_dotenv
+import os
 
 # Get the absolute path to the project directory
 PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -23,4 +25,7 @@ if not os.path.exists(CONFIG_PATH):
     with open(CONFIG_PATH, "w") as file:
         json.dump(DEFAULT_SETTINGS, file, indent=4)
         
-from services.file_service import load_settings, save_settings
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
