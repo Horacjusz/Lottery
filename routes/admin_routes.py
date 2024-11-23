@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 from services.verification import is_visible
 from services.file_service import load_settings, save_settings
 from services.lists_service import get_all_users, get_all_items
+from services.draw_service import reset_draw
 from sqlalchemy import text
 from services.database import datasession
 from settings.tokens import *
@@ -31,6 +32,11 @@ def toggle_lottery():
     save_settings(settings)
 
     return jsonify({"success": True, "LOTTERY_ACTIVE": settings["LOTTERY_ACTIVE"]})
+
+@admin_blueprint.route("/reset_lottery", methods=["POST"])
+def reset_lottery():
+    reset_draw()
+    return jsonify({"success": True})
 
 def truncate_tables():
     try:

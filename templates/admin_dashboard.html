@@ -22,6 +22,13 @@
                     <p id="lottery-status">
                         Current status: {{ 'Enabled' if settings.LOTTERY_ACTIVE else 'Disabled' }}
                     </p>
+                    {% if not settings.LOTTERY_ACTIVE %}
+                        <p>
+                            <button type="button" class="dashboard-link logout" onclick="resetLottery()">
+                                resetLottery
+                            </button>
+                        </p>
+                    {% endif %}
                 </div>
             </div>
             {% set admin = true %}
@@ -103,6 +110,12 @@
                     </ul>
                 </div>
             </div>
+
+
+
+
+
+
             <div class="section">
                 <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>
             </div>

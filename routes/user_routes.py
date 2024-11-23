@@ -67,7 +67,10 @@ def is_username_free():
     if not data or USERNAME not in data:
         return jsonify({"is_free": False, "error": "Invalid request.", "success": True}), 400
 
+
     username = data[USERNAME]
+    user_id = data[USER_ID]
+    print(user_id)
     users_data = get_all_users()
     is_free = not any(user[USERNAME] == username for user in users_data.values())
 
@@ -79,6 +82,11 @@ def is_username_free():
     if edit_mode :
         if (username == session.get(USERNAME)) :
             is_free = True
+    
+       
+    if session.get(USER_ID) == 0 :
+        is_free = True     
+    
 
     return jsonify({"is_free": is_free, "success": True})
 

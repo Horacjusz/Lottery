@@ -38,6 +38,28 @@ function submitDrawForm(user_id) {
     });
 }
 
+
+function resetLottery() {
+    
+    fetch(`/admin/reset_lottery`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while processing the draw request.");
+    });
+}
+
+
 function toggleLotteryActive(event) {
 
     event.preventDefault();
@@ -445,6 +467,7 @@ function updateUser(event, user_id = null, edit_mode = true) {
     const spouseElement = document.querySelector(`#spouse-${user_id}`);
     const spouse = spouseElement ? spouseElement.value : null;
 
+    console.log(user_id)
 
     // Check if passwords match
     if (password !== confirmPassword) {
@@ -458,7 +481,7 @@ function updateUser(event, user_id = null, edit_mode = true) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, user_id }),
+        body: JSON.stringify({ username: username, user_ID: user_id }),
     })
         .then((response) => {
             if (!response.ok) {
