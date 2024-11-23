@@ -2,7 +2,7 @@
     "item_id": 5,
     "item_name": "mission",
     "item_description": "Would far guy whom.",
-    "reserved_by": null,
+    "reserved_by": 9,
     "owner_id": 3,
     "bought": false
 }

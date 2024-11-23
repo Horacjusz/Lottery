@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, session
 from datetime import timedelta
 from settings.settings import *
 from generation.generate_owner import generate_owner
+import os
 
 from routes.auth_routes import auth_blueprint
 from routes.dashboard_routes import dashboard_blueprint
@@ -18,12 +19,15 @@ app.secret_key = 'your_secret_key'  # Set your secret key here
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes = 5)
 app.config["SESSION_PERMANENT"] = True
 
+from flask_cors import CORS
+print(CORS(user_blueprint))  # lub CORS(user_blueprint) w Twoim kodzie
 app.register_blueprint(item_blueprint, url_prefix="/items")
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(dashboard_blueprint)
 app.register_blueprint(draw_blueprint, url_prefix="/draw")
 app.register_blueprint(admin_blueprint, url_prefix="/admin")
 app.register_blueprint(user_blueprint, url_prefix="/users")
+
 
 
 @app.route("/")

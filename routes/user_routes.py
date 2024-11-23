@@ -9,34 +9,34 @@ from services.lists_service import get_available_spouses, get_all_users, get_all
 
 user_blueprint = Blueprint("user", __name__, template_folder="templates")
 
-@user_blueprint.route("/update/<int:user_id>", methods=["POST", "GET"])
-@user_blueprint.route("/update/", methods=["POST", "GET"])
-def update_user_route(user_id=None, edit_mode = False):
+@user_blueprint.route("/update", methods=["POST", "GET"])
+def update_user_route():
     """Route to update or create a new user."""
     print("update_user_route")
     if request.method != "POST":
         return render_template("register.html", user = None, settings = load_settings(), edit_mode = False, user_id = 'new', users_data = get_all_users())
-    
-    print(f"Updating user: {user_id}")
-    print("communicated to backend")
+
     try:
-        print(user_id)
-        if user_id == 'new' :
-            user_id = None
-        
+
         data = request.get_json()
         print(data)
         if not data:
             return jsonify({"success": False, "error": "Invalid JSON payload."}), 400
+        user_id = data.get("user_id", None)
+        new_name = data.get("name", None)
+        new_username = data.get("username", None)
+        new_password = data.get("password", None)
+        new_choosable = data.get("choosable", True)
+        new_visible = data.get("visible", True)
+        new_admin = data.get("admin", False)
+        new_spouse = data.get("spouse", None)
 
-        new_name = data.get("new_name", None)
-        new_username = data.get("new_username", None)
-        new_password = data.get("new_password", None)
-        new_choosable = data.get("new_choosable", True)
-        new_visible = data.get("new_visible", True)
-        new_admin = data.get("new_admin", False)
-        new_spouse = data.get("new_spouse", None)
-        
+        print(f"Updating user: {user_id}")
+        print("communicated to backend")
+        print(user_id)
+        if user_id == 'new' :
+            user_id = None
+
         # Handle spouse reset explicitly
         reset_spouse = False
         if new_spouse == "None":
@@ -47,7 +47,7 @@ def update_user_route(user_id=None, edit_mode = False):
                 new_spouse = int(new_spouse)
             except ValueError:
                 return jsonify({"success": False, "error": "Invalid spouse ID."}), 400
-            
+
         print("check existance of", user_id)
         # If `user_id` is None or user doesn't exist, create a new user
         if user_id is None or not check_user_existence(user_id):
@@ -70,16 +70,18 @@ def update_user_route(user_id=None, edit_mode = False):
 
         return jsonify({"success": True, "message": "User updated successfully."})
     except Exception as e:
-        print(f"Error updating user {user_id}: {e}")
+        print(f"Error updating user: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 
 @user_blueprint.route("/is_username_free", methods=["POST"])
 def is_username_free():
     """Endpoint to check if a username is available."""
+    print("checking for username")
     data = request.get_json()
+    print(data)
     if not data or USERNAME not in data:
-        return jsonify({"is_free": False, "error": "Invalid request."}), 400
+        return jsonify({"is_free": False, "error": "Invalid request.", "success": True}), 400
 
     username = data[USERNAME]
     users_data = get_all_users()
@@ -97,7 +99,7 @@ def is_username_free():
 
     print(f"username {username} being free is {is_free}")
 
-    return jsonify({"is_free": is_free})
+    return jsonify({"is_free": is_free, "success": True})
 
 
 

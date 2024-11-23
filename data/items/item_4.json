@@ -2,7 +2,7 @@
     "item_id": 4,
     "item_name": "arm",
     "item_description": "Industry individual performance among by.",
-    "reserved_by": null,
+    "reserved_by": 9,
     "owner_id": 2,
     "bought": false
 }

@@ -49,7 +49,7 @@ function toggleLotteryActive(event) {
         },
     })
     .then(response => {
-        if (!response.ok) {
+        if (!response.success) {
             throw new Error("Failed to toggle lottery status.");
         }
         return response.json();
@@ -117,7 +117,7 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
         .then((data) => {
             if (data.success) {
                 // Correctly remove the item from the wishlist
-                const wishlistRow = document.querySelector(`#wishlist- tr[data-item-id="${item_id}"]`);
+                const wishlistRow = document.querySelector(`#wishlist-${data.owner_id} tr[data-item-id="${item_id}"]`);
                 console.log(wishlistRow);
                 if (wishlistRow) {
                     wishlistRow.remove();
@@ -440,8 +440,7 @@ function updateUser(event, user_id = null, edit_mode = true) {
 
     const spouseElement = document.querySelector(`#spouse-${user_id}`);
     const spouse = spouseElement ? spouseElement.value : null;
-    
-    if (user_id == 'new') {user_id = null;}
+
 
     // Check if passwords match
     if (password !== confirmPassword) {
@@ -455,34 +454,38 @@ function updateUser(event, user_id = null, edit_mode = true) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ username, user_id }),
     })
         .then((response) => {
+            console.log(response)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             return response.json();
         })
         .then((data) => {
+            console.log(data)
             if (!data.is_free) {
                 document.getElementById("error").textContent = "Nazwa użytkownika jest już zajęta.";
                 return;
             }
+            console.log("data was true")
 
             // Continue if username is free
             const payload = {
-                user_id: user_id,
-                new_spouse: spouse,
-                new_name: name,
-                new_username: username,
-                new_password: password,
-                new_choosable: choosable,
-                new_visible: visible,
-                new_admin: admin,
+                user_id,
+                edit_mode,
+                spouse,
+                name,
+                username,
+                password,
+                choosable,
+                visible,
+                admin
             };
-
-            const str = user_id ? `/${user_id}` : "";
-            fetch(`/users/update${str}`, {
+            
+            console.log("Payload created " + JSON.stringify(payload))
+            fetch(`/users/update`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -490,6 +493,7 @@ function updateUser(event, user_id = null, edit_mode = true) {
                 body: JSON.stringify(payload),
             })
                 .then((response) => {
+                    console.log(response)
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }
@@ -515,3 +519,4 @@ function updateUser(event, user_id = null, edit_mode = true) {
             document.getElementById("error").textContent = "Nazwa użytkownika jest już zajęta.";
         });
 }
+

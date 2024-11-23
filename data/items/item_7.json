@@ -2,7 +2,7 @@
     "item_id": 7,
     "item_name": "like",
     "item_description": "Walk against care act take.",
-    "reserved_by": null,
+    "reserved_by": 9,
     "owner_id": 5,
     "bought": false
 }

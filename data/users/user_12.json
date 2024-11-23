@@ -1,0 +1,14 @@
+{
+    "user_ID": 12,
+    "name": "Test User42",
+    "username": "test_user42",
+    "password": "test",
+    "visible": true,
+    "choosable": true,
+    "spouse": null,
+    "assignment": null,
+    "assigned_to": null,
+    "admin": false,
+    "wishlist": [],
+    "reserved_items": []
+}

@@ -2,7 +2,7 @@
     "item_id": 8,
     "item_name": "power",
     "item_description": "Sense significant pass pressure position society include.",
-    "reserved_by": null,
+    "reserved_by": 9,
     "owner_id": 5,
     "bought": false
 }
