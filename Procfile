@@ -1,1 +1,1 @@
-web: python app.py
+web: python /opt/render/project/src/Lottery/app.py
