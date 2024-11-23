@@ -12,7 +12,7 @@ item_blueprint = Blueprint("item", __name__, template_folder="templates")
 @item_blueprint.route("/remove/<int:item_id>", methods=["POST"])
 def remove_item_route(item_id):
     try:
-        check = delete_item(item_id)  # Call the service function to delete the item
+        check = delete_item(item_id)
         if check:
             return jsonify({"success": True, "message": f"Item {item_id} removed successfully."})
         else:
@@ -24,7 +24,7 @@ def remove_item_route(item_id):
 @item_blueprint.route("/reserve/<int:user_id>/<int:item_id>", methods=["POST"])
 def reserve_item_route(user_id, item_id):
     try:
-        reserved_item = reserve_item(user_id, item_id)# Call the service function to reserve the item
+        reserved_item = reserve_item(user_id, item_id)
         if reserved_item:
             return jsonify({
                 "success": True,
@@ -106,7 +106,7 @@ def add_item_route():
             return jsonify({"success": False, "error": "Missing item name or owner ID."}), 400
 
         item = create_item(owner_id, {ITEM_NAME: item_name, ITEM_DESCRIPTION: item_description})
-
+        print("finished creating new item")
         return jsonify({"success": True, "item": item})
     except Exception as e:
         print(f"Error adding item: {e}")

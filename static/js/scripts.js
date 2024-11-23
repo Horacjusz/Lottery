@@ -1,3 +1,9 @@
+function linkify(text) {
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    return text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
+}
+
+
 function submitDrawForm(user_id) {
     const form = document.getElementById(`draw-form-${user_id}`);
     const url = form.action;
@@ -15,8 +21,6 @@ function submitDrawForm(user_id) {
         return response.json();
     })
     .then(data => {
-        console.log("Server response:", data);
-
         if (data.success) {
             const assignmentElement = document.getElementById(`assignment-${user_id}`);
             if (data.assignment) {
@@ -116,7 +120,6 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
             if (data.success) {
                 // Correctly remove the item from the wishlist
                 const wishlistRow = document.querySelector(`#wishlist-${data.owner_id} tr[data-item-id="${item_id}"]`);
-                console.log(wishlistRow);
                 if (wishlistRow) {
                     wishlistRow.remove();
                 }
@@ -128,7 +131,7 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
                         <tr class="reserved-item" data-item-id="${item_id}">
                             <td>
                                 <span class="item-name">${data.item.item_name}</span>
-                                <span class="item-description">${data.item.item_description}</span>
+                                <span class="item-description">${linkify(item.item_description)}</span>
                             </td>
                             <td>
                                 <span class="remove-icon" onclick="unreserveItem(event, '${item_id}')">×</span>
@@ -251,7 +254,6 @@ function toggleBought(event, item_id) {
 
 
 function editItem(event, item_id, itemName, itemDescription) {
-    console.log("Editing item:", item_id);
     event.preventDefault();
     event.stopPropagation();
 
@@ -259,17 +261,14 @@ function editItem(event, item_id, itemName, itemDescription) {
     const nameCell = row.querySelector(".item-name");
     const descCell = row.querySelector(".item-description");
 
-    // Replace text with input fields for editing
     nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name">`;
     descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
 
-    // Change edit icon to save icon
     const editIconCell = row.querySelector(".edit-icon").parentElement;
     editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, ${item_id})">💾</span>`;
 }
 
 function saveItem(event, item_id) {
-    console.log("Saving item:", item_id);
     event.preventDefault();
     event.stopPropagation();
 
@@ -290,7 +289,6 @@ function saveItem(event, item_id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            console.log("Item saved successfully:", data);
 
             // Update the row with the new data
             row.querySelector(".item-name").innerText = newName;
@@ -345,7 +343,8 @@ function removeItem(event, item_id) {
 }
 
 
-function addItem(owner_id) {
+function addItem(event, owner_id) {
+    event.preventDefault()
     const itemInput = document.getElementById(`wishlist_item-${owner_id}`);
     const descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
 
@@ -378,8 +377,8 @@ function addItem(owner_id) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                updateWishlist(owner_id, data.item); // Update wishlist with the new item
-                itemInput.value = ""; // Clear the input fields
+                updateWishlist(owner_id, data.item);
+                itemInput.value = "";
                 descriptionInput.value = "";
             } else {
                 alert(data.error || "Nie udało się dodać przedmiotu.");
@@ -394,13 +393,18 @@ function addItem(owner_id) {
 
 function updateWishlist(owner_id, item) {
     const wishlistTable = document.getElementById(`own-wishlist-table-${owner_id}`);
+    if (!wishlistTable) {
+        console.error("Wishlist table not found for owner ID:", owner_id);
+        return;
+    }
+
     const newRow = document.createElement("tr");
     newRow.setAttribute("data-item-id", item.item_id);
 
     newRow.innerHTML = `
         <td>
             <span class="item-name">${item.item_name}</span>
-            <span class="item-description">${item.item_description}</span>
+            <span class="item-description">${linkify(item.item_description)}</span>
         </td>
         <td>
             <span class="edit-icon" onclick="editItem(event, '${item.item_id}', '${item.item_name}', '${item.item_description}')">✎</span>
@@ -409,8 +413,10 @@ function updateWishlist(owner_id, item) {
             <span class="remove-icon" onclick="removeItem(event, ${item.item_id})">×</span>
         </td>
     `;
+
     wishlistTable.querySelector("tbody").appendChild(newRow);
 }
+
 
 
 function validatePasswords() {
@@ -455,19 +461,16 @@ function updateUser(event, user_id = null, edit_mode = true) {
         body: JSON.stringify({ username, user_id }),
     })
         .then((response) => {
-            console.log(response)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             return response.json();
         })
         .then((data) => {
-            console.log(data)
             if (!data.is_free) {
                 document.getElementById("error").textContent = "Nazwa użytkownika jest już zajęta.";
                 return;
             }
-            console.log("data was true")
 
             // Continue if username is free
             const payload = {
@@ -482,7 +485,6 @@ function updateUser(event, user_id = null, edit_mode = true) {
                 admin
             };
             
-            console.log("Payload created " + JSON.stringify(payload))
             fetch(`/users/update`, {
                 method: "POST",
                 headers: {
@@ -491,7 +493,6 @@ function updateUser(event, user_id = null, edit_mode = true) {
                 body: JSON.stringify(payload),
             })
                 .then((response) => {
-                    console.log(response)
                     if (!response.ok) {
                         throw new Error(`HTTP error! Status: ${response.status}`);
                     }

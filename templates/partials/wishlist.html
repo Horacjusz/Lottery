@@ -1,8 +1,10 @@
 <table class="wishlist-table" id="wishlist-{{ assignment.user_ID }}">
     <tbody>
+        {% set number = 0 %}
         {% for item_id in assignment.wishlist %}
             {% set item = items_data[item_id] %}
             {% if item.reserved_by is none %}
+                {% set number = number + 1 %}
                 <tr data-item-id="{{ item_id }}" data-item="{{ item_id }}">
                     <td>
                         <span class="item-name">{{ item.item_name }}</span>
@@ -15,4 +17,9 @@
             {% endif %}
         {% endfor %}
     </tbody>
+    {% if number == 0 %}
+        <p>
+            Nic tu jeszcze nie ma
+        </p>
+    {% endif %}
 </table>

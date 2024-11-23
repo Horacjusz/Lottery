@@ -5,7 +5,6 @@ from settings.settings import DEFAULT_ITEM_NAME
 from services.retrieval import get_free_id
 from services.database import datasession
 from models.models import Item
-import os
 
 def check_item_existence(item_id):
     item = datasession.query(Item).filter_by(item_id=item_id).first()

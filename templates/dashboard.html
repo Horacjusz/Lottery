@@ -75,6 +75,11 @@
 
         <p>Jeśli chcesz z jakiegoś powodu usunąć swoje konto skontaktuj się z administratorem</p>
 
+        {% if admin %}
+            <div class="section">
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="dashboard-link">Panel Administratora</a>
+            </div>
+        {% endif %}
     </div>
 
 </body>

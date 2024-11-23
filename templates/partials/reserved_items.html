@@ -5,7 +5,7 @@
             <tr class="reserved-item {% if item.bought %}reserved-green{% endif %}" data-item-id="{{ item_id }}">
                 <td>
                     <span class="item-name">{{ item.item_name }}</span>
-                    <span class="item-description">{{ item.item_description }}</span>
+                    <span class="item-description">{{ item.item_description | linkify | safe }}</span>
                     <span class="item-owner">{{ item.owner_name }}</span>
                 </td>
                 <td>

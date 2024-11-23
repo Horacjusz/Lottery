@@ -60,6 +60,8 @@ def print_all_users() :
     for Id in get_all_ids(USERS) :
         print_user(Id)
   
+  
+# Unsafe to use -> for future development
 def delete_user(user_id):
     
     if not check_user_existence(user_id):
@@ -67,11 +69,13 @@ def delete_user(user_id):
         return True
 
     user = datasession.query(User).filter_by(user_id=user_id).first()
-
+    
+    
     if not user:
         print(f"User {user_id} does not exist in the database.")
         return True
 
+    
     if user.assigned_to is not None and user.assignment is None:
         assignment_id = user.assigned_to
         edit_user(assignment_id, reset_assignment=True)
@@ -106,6 +110,7 @@ def delete_user(user_id):
             print("Cannot delete user due to assignment clutch")
             return False
 
+    
     from services.item_functions.item_service import delete_item, unreserve_item
     for item_id in user.wishlist:
         delete_item(item_id)

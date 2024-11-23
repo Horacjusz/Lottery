@@ -51,7 +51,7 @@ def refresh_session():
 
 def prepare_app() :
     debug = os.getenv("FLASK_ENV") == "development"
-    if debug : truncate_tables()
+    # if debug : truncate_tables()
     initialize_db()
     save_settings(DEFAULT_SETTINGS)
     generate_owner()
