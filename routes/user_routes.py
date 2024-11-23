@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, session
 from services.user_functions.user_service import edit_user, check_user_existence, create_user
 from settings.tokens import *
 from flask import Blueprint, render_template, request
-from services.user_functions.user_service import create_user
+from services.user_functions.user_service import create_user, delete_user
 from services.file_service import load_settings
 from services.lists_service import get_all_users, get_all_items
 
@@ -90,3 +90,22 @@ def user_list():
     user_id = session[USER_ID]
     
     return render_template("user_list.html", users=get_all_users().values(), user_id=user_id, items_data = get_all_items())
+
+
+
+@user_blueprint.route('/delete_user_route', methods=['POST'])
+def delete_user_route():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        if user_id is None:
+            return jsonify({"success": False, "message": "User ID not provided"}), 400
+
+        success = delete_user(user_id)
+
+        if success:
+            return jsonify({"success": True})
+        else:
+            return jsonify({"success": False, "message": "Could not delete user due to assignment conflicts"})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500

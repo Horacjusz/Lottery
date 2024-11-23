@@ -7,6 +7,7 @@ import os
 from services.database import initialize_db
 from settings.settings import DEFAULT_SETTINGS
 from services.file_service import save_settings
+from routes.admin_routes import truncate_tables
 from dotenv import load_dotenv
 
 from routes.auth_routes import auth_blueprint
@@ -43,9 +44,15 @@ def refresh_session():
     session.modified = True
 
 def prepare_app() :
+    debug = os.getenv("FLASK_ENV") == "development"
+    if debug : truncate_tables()
     initialize_db()
     save_settings(DEFAULT_SETTINGS)
     generate_owner()
+    if debug :
+        from services.user_functions.user_service import create_user
+        for _ in range(0) :
+            create_user()
     
 
 if __name__ == "__main__":

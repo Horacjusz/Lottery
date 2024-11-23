@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, session, redirect, url_for, flash,
 from services.verification import is_visible
 from services.file_service import load_settings, save_settings
 from services.lists_service import get_all_users, get_all_items
+from sqlalchemy import text
+from services.database import datasession
 from settings.tokens import *
 
 admin_blueprint = Blueprint("admin", __name__, template_folder="templates")
@@ -29,3 +31,14 @@ def toggle_lottery():
     save_settings(settings)
 
     return jsonify({"success": True, "LOTTERY_ACTIVE": settings["LOTTERY_ACTIVE"]})
+
+def truncate_tables():
+    try:
+        # Truncate tables manually
+        datasession.execute(text("TRUNCATE TABLE items CASCADE"))
+        datasession.execute(text("TRUNCATE TABLE users CASCADE"))
+        datasession.commit()
+        print("All tables truncated successfully.")
+    except Exception as e:
+        datasession.rollback()
+        print(f"Error truncating tables: {e}")

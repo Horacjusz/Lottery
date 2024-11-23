@@ -519,3 +519,26 @@ function updateUser(event, user_id = null, edit_mode = true) {
         });
 }
 
+
+async function deleteUser(userId) {
+    try {
+        const response = await fetch(`/users/delete_user_route`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert(`User ${userId} has been deleted.`);
+            location.reload(); // Refresh the page on success
+        } else {
+            alert(`Failed to delete user ${userId}: ${result.message}`);
+        }
+    } catch (error) {
+        alert(`Error deleting user ${userId}: ${error.message}`);
+    }
+}
