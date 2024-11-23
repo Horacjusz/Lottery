@@ -10,8 +10,6 @@ USERS_PATH = os.path.join(PROJECT_PATH, "data", "users")
 os.makedirs(USERS_PATH, exist_ok=True)
 ITEMS_PATH = os.path.join(PROJECT_PATH, "data", "items")
 os.makedirs(ITEMS_PATH, exist_ok=True)
-USERNAMES_PATH = os.path.join(PROJECT_PATH, "data", "users", "usernames.json")
-os.makedirs(USERS_PATH, exist_ok=True)
 DEFAULT_PASSWORD = "test"
 
 
@@ -24,11 +22,7 @@ DEFAULT_SETTINGS = {
 if not os.path.exists(CONFIG_PATH):
     with open(CONFIG_PATH, "w") as file:
         json.dump(DEFAULT_SETTINGS, file, indent=4)
-        
-# Ensure usernames.json exists
-if not os.path.exists(USERNAMES_PATH):
-    with open(USERNAMES_PATH, "w") as file:
-        json.dump({}, file, indent=4)
+
 
 # Load settings from the config.json file
 def load_settings():
