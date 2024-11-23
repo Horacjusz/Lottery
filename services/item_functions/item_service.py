@@ -86,17 +86,21 @@ def reserve_item(user_id, item_id) :
     return item_data
 
 def unreserve_item(item_id) :
+    print("unreserving", item_id)
     if not check_item_existence(item_id) :
         print(f"Item {item_id} does not exist")
         return False
     item_data = load_item_file(item_id)
+    print(item_data)
     if item_data[BOUGHT] :
         print("Cannot unreserve item, because it was already bought")
         return False
     user_id = item_data[RESERVED_BY]
     item_data[RESERVED_BY] = None
     save_item_file(item_data)
-    if user_id is None : return item_data
+    if user_id is None : 
+        print(f"Item {item_id} has been unreserved")
+        return item_data
     user_data = load_user_file(user_id)
     user_data[RESERVED_ITEMS].remove(item_id)
     save_user_file(user_data)
