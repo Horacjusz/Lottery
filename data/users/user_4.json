@@ -1,0 +1,16 @@
+{
+    "user_ID": 4,
+    "name": "Linda Bailey",
+    "username": "user_4",
+    "password": "test",
+    "visible": true,
+    "choosable": true,
+    "spouse": null,
+    "assignment": null,
+    "assigned_to": null,
+    "admin": false,
+    "wishlist": [
+        6
+    ],
+    "reserved_items": []
+}
