@@ -6,7 +6,7 @@
                 <tr data-item-id="{{ item_id }}" data-item="{{ item_id }}">
                     <td>
                         <span class="item-name">{{ item.item_name }}</span>
-                        <span class="item-description">{{ item.item_description }}</span>
+                        <span class="item-description">{{ item.item_description | linkify | safe }}</span>
                     </td>
                     <td>
                         <span class="approve-icon" onclick="reserveItem(event, {{ user_id }}, {{ item.item_id }}, {{ on_dashboard | default('false') | lower }})">✔</span>

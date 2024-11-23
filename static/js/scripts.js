@@ -1,4 +1,3 @@
-// Function to submit draw form
 function submitDrawForm(user_id) {
     const form = document.getElementById(`draw-form-${user_id}`);
     const url = form.action;
@@ -23,7 +22,7 @@ function submitDrawForm(user_id) {
             if (data.assignment) {
                 assignmentElement.innerHTML = `${data.assignment_name || "Unknown Name"} -> Odśwież, aby zobaczyć listę prezentową`;
             } else {
-                assignmentElement.textContent = "No assignment available.";
+                assignmentElement.textContent = "Nie udało się nikogo znaleźć :c";
             }
         } else {
             alert("Failed to process the draw request.");

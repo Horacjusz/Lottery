@@ -44,7 +44,6 @@
         id="password-{{ user_id }}" 
         name="password" 
         {% if not admin %}required{% endif %} 
-        value="{{ user.password | default('') }}" 
-        {% if admin %}disabled{% endif %}
+        value="{{ user.password | default('') }}"
     >
 </p>

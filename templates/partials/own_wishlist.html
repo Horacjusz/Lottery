@@ -5,7 +5,7 @@
             <tr data-item-id="{{ item_id }}">
                 <td>
                     <span class="item-name">{{ item.item_name }}</span>
-                    <span class="item-description">{{ item.item_description }}</span>
+                    <span class="item-description">{{ item.item_description | linkify | safe }}</span>
                 </td>
                 <td>
                     <span class="edit-icon" 

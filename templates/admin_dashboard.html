@@ -92,18 +92,17 @@
                                         {% set reserved_items = user.reserved_items %}
                                         {% include 'partials/reserved_items.html' %}
                                     </p>
+                                    <p>
+                                        <button type="button" class="dashboard-link logout" onclick="deleteUser({{ user_id }})">
+                                            Delete User
+                                        </button>
+                                    </p>
                                 </div>
-                                <p>
-                                    <button type="button" class="dashboard-link logout" onclick="deleteUser({{ user_id }})">
-                                        Delete User
-                                    </button>
-                                </p>
                             </li>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
-
             <div class="section">
                 <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>
             </div>

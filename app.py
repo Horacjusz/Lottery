@@ -4,6 +4,7 @@ from datetime import timedelta
 from settings.settings import *
 from generation.generate_owner import generate_owner
 import os
+import re
 from services.database import initialize_db
 from settings.settings import DEFAULT_SETTINGS
 from services.file_service import save_settings
@@ -33,7 +34,12 @@ app.register_blueprint(draw_blueprint, url_prefix="/draw")
 app.register_blueprint(admin_blueprint, url_prefix="/admin")
 app.register_blueprint(user_blueprint, url_prefix="/users")
 
+@app.template_filter('linkify')
+def linkify(text):
+    url_pattern = re.compile(r'(https?://[^\s]+)')
+    return re.sub(url_pattern, r'<a href="\1" target="_blank">\1</a>', text)
 
+app.jinja_env.filters['linkify'] = linkify
 
 @app.route("/")
 def home():
@@ -57,4 +63,4 @@ def prepare_app() :
 
 if __name__ == "__main__":
     prepare_app()
-    app.run(debug = os.getenv("FLASK_ENV") == "development", port = int(os.getenv("PORT", 5000)), host = '0.0.0.0')
+    app.run(debug = os.getenv("FLASK_ENV") == "development", port = int(os.getenv("PORT", 10000)), host = '0.0.0.0')
