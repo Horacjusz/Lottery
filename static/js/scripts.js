@@ -224,7 +224,9 @@ function unreserveItem(event, item_id, on_dashboard) {
 }
 
 
-function toggleBought(event, item_id) {
+
+
+function toggleBought(event, item_id, user_id) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -234,16 +236,27 @@ function toggleBought(event, item_id) {
             "Content-Type": "application/json",
         },
     })
-        .then((response) => response.json())
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then((data) => {
             if (data.success) {
+                const reservedTable = document.querySelector(`#reserved-table-${user_id}`);
                 const reservedRow = document.querySelector(`tr[data-item-id="${item_id}"]`);
-                if (reservedRow) {
+
+                if (reservedRow && reservedTable) {
                     if (data.bought) {
                         reservedRow.classList.add("reserved-green");
+                        reservedTable.appendChild(reservedRow);
                     } else {
                         reservedRow.classList.remove("reserved-green");
+                        reservedTable.prepend(reservedRow);
                     }
+                } else {
+                    console.error("Reserved table or row not found.");
                 }
 
                 const reservedCell = document.querySelector(`#reserved-table-${item_id}-accept`);
@@ -255,16 +268,20 @@ function toggleBought(event, item_id) {
                         reservedCell.classList.remove("edit-icon");
                         reservedCell.classList.add("remove-icon");
                     }
+                } else {
+                    console.error("Reserved cell not found.");
                 }
             } else {
                 alert(data.error || "Error toggling bought status.");
             }
         })
         .catch((error) => {
-            console.error("Error:", error);
+            console.error("Error occurred:", error.message || error);
             alert("An error occurred while processing the request.");
         });
 }
+
+
 
 
 function editItem(event, item_id, itemName, itemDescription) {
