@@ -15,9 +15,9 @@
         <h2>Witaj, {{ user.name }}!</h2>
         <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.<br>Jeśli chcesz skontaktowac się z administratorem jest nim Paweł</p>
 
+        {% if user.choosable %}
         <div class="section">
             <h3>Losowanie</h3>
-            {% if user.choosable %}
                 {% if user.assignment is none %}
                     <p id="assignment-{{ user_id }}">
                         Musisz kogoś wylosować
@@ -36,9 +36,9 @@
                         {% include 'partials/wishlist.html' %}
                     </div>
                 {% endif %}
-            {% endif %}
             {% include 'partials/draw_button.html' %}
         </div>
+        {% endif %}
         
         <div class="section">
             <h3>Twoje zarezerwowane przedmioty:</h3>
@@ -59,11 +59,29 @@
             <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
             
             {% include 'partials/own_wishlist.html' %}
-
-
         </div>
 
+        <div class="section">
+            <h3>Małżonek</h3>
+                {% if user.spouse is none %}
+                    <p id="assignment-{{ user_id }}">
+                        Nie posiadasz małżonka - Jeśli chcesz, żeby ktoś sie tu pojawił, spoczekaj aż stworzy konto lub poszukaj go na stronie edycji danych
+                    </p>
+                {% else %}
+                    {% set assignment = users_data[user.spouse] %}
+                    
+                    <div class="assigned-user-info">
+                        <p>
+                            <strong>Twoim małżonkiem jest:</strong>
 
+                            <p id="assignment-{{ user_id }}", class = "user-name">
+                                {{ assignment.name }}
+                            </p>
+                        </p>
+                        {% include 'partials/wishlist.html' %}
+                    </div>
+                {% endif %}
+        </div>
 
         <div class="section">
             <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
