@@ -310,8 +310,11 @@ function saveItem(event, item_id) {
     const newName = nameInput.value.trim();
     const newDescription = descInput.value.trim();
 
-    if (!newName || !newDescription) {
-        alert("Nazwa i opis przedmiotu nie mogą być puste.");
+    if (!newDescription) {
+        newDescription = " ";
+    }
+    if (!newName) {
+        alert("Nazwa przedmiotu nie może być pusta.");
         return;
     }
 
