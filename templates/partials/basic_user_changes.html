@@ -48,6 +48,6 @@
     >
 </p>
 <p>
-    <label for="confirm_password-{{ user_id }}"><strong>Potwierdź hasło</strong>{% if edit_mode %} (może pozostać puste){% endif %}:</label>
+    <label for="confirm_password-{{ user_id }}"><strong>Potwierdź hasło</strong>{% if edit_mode %}<br>Jeśli nie chcesz go zmieniać, nic nie rób{% endif %}:</label>
     <input type="password" id="confirm_password-{{ user_id }}" name="password" value = "{{ user.password | default('') }}" {% if not admin %}required{% endif %}>
 </p>
