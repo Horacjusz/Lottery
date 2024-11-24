@@ -22,7 +22,7 @@ load_dotenv()
 
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = os.getenv("SECRET_KEY", "default_secret_key")
+app.secret_key = os.getenv("SECRET_KEY")
 
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes = 5)
 app.config["SESSION_PERMANENT"] = True
@@ -50,7 +50,7 @@ def refresh_session():
     session.modified = True
 
 def prepare_app() :
-    debug = os.getenv("FLASK_ENV") == "development"
+    debug = os.getenv("DEBUG") == "true"
     # if debug : truncate_tables()
     initialize_db()
     save_settings(DEFAULT_SETTINGS)
@@ -63,4 +63,4 @@ def prepare_app() :
 
 if __name__ == "__main__":
     prepare_app()
-    app.run(debug = os.getenv("FLASK_ENV") == "development", port = int(os.getenv("PORT", 5000)), host = '0.0.0.0')
+    app.run(debug = os.getenv("DEBUG") == "true", port = int(os.getenv("PORT")), host = '0.0.0.0')

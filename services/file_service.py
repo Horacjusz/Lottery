@@ -11,7 +11,7 @@ def get_user_database(user_id) :
         print(f"User with ID {user_id} not found in the database.\n->{e}")
     return None
 
-def get_item_dtabase(item_id) :
+def get_item_database(item_id) :
     try :
         item = datasession.query(Item).filter_by(item_id=item_id).first()
         if item:
@@ -110,7 +110,7 @@ def load_user_as_dict(user_id) :
 
 
 def load_item_as_dict(item_id) :
-    item = get_item_dtabase(item_id)
+    item = get_item_database(item_id)
     if item:
         item_data = {
             ITEM_ID: item.item_id,
@@ -140,7 +140,7 @@ def delete_user_data(user_id):
     
     
 def save_item_data(item_data):
-    item = get_item_dtabase(item_data[ITEM_ID])
+    item = get_item_database(item_data[ITEM_ID])
     if not item:
         item = Item(item_id=item_data[ITEM_ID])
     item.item_name = item_data.get("item_name")
@@ -151,15 +151,13 @@ def save_item_data(item_data):
     datasession.add(item)
     datasession.commit()
 
-# def load_item_data(item_id):
-
 
 def delete_item_data(item_id):
     """
     Delete an item from the database by its ID.
     """
     try:
-        item = get_item_dtabase(item_id)
+        item = get_item_database(item_id)
         if item:
             datasession.delete(item)
             datasession.commit()

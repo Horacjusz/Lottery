@@ -49,7 +49,6 @@
                                     <p>
                                         <strong>Assignment:</strong></strong>
 
-                                        <!-- Assignment Display -->
                                         <p id="assignment-{{ user_id }}">
                                             {{ user.assignment }}
                                             {% if user.assignment is not none %}
@@ -57,7 +56,6 @@
                                             {% endif %}
                                         </p>      
 
-                                        <!-- Draw Form -->
                                         {% include 'partials/draw_button.html' %}
 
                                     </p>
@@ -100,9 +98,15 @@
                                         {% include 'partials/reserved_items.html' %}
                                     </p>
                                     <p>
-                                        <button type="button" class="dashboard-link logout" onclick="deleteUser({{ user_id }})">
-                                            Delete User
-                                        </button>
+                                        {% if user_id != admin_id %}
+                                            <button type="button" class="dashboard-link logout" onclick="deleteUser({{ user_id }})">
+                                                Delete User
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="dashboard-link logout">
+                                                Nie możesz usunąć samego siebie
+                                            </button>
+                                        {% endif %}
                                     </p>
                                 </div>
                             </li>

@@ -1,8 +1,21 @@
 <table class="wishlist-table" id="reserved-table-{{ user_id }}">
     <tbody>
+        {% set just_reserved = [] %}
+        {% set reserved_and_bought = [] %}
         {% for item_id in reserved_items %}
             {% set item = items_data[item_id] %}
-            <tr class="reserved-item 
+            {% if item.bought %}
+                {% set _ = reserved_and_bought.append(item_id) %}
+            {% else %}
+                {% set _ = just_reserved.append(item_id) %}
+            {% endif %}
+        {% endfor %}
+
+
+        {% for item_id in just_reserved %}
+            {% set item = items_data[item_id] %}
+            {% include 'partials/reserved_list_item.html' %}
+            {# <tr class="reserved-item 
                 {% if item.bought %}
                     reserved-green
                 {% endif %}" 
@@ -18,7 +31,11 @@
                 <td>
                     <span class="edit-icon" onclick="toggleBought(event, '{{ item_id }}')">💲</span>
                 </td>
-            </tr>
+            </tr> #}
+        {% endfor %}
+        {% for item_id in reserved_and_bought %}
+            {% set item = items_data[item_id] %}
+            {% include 'partials/reserved_list_item.html' %}
         {% endfor %}
     </tbody>
 </table>

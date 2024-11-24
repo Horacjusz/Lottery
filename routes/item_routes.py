@@ -47,7 +47,7 @@ def unreserve_item_route(item_id):
     try:
         user_id = load_item_data(item_id)[RESERVED_BY]
 
-        unreserved_item = unreserve_item(item_id)
+        unreserved_item, message = unreserve_item(item_id)
         if unreserved_item:
             return jsonify({
                 "success": True,
@@ -56,10 +56,10 @@ def unreserve_item_route(item_id):
                     "item_name": unreserved_item["item_name"],
                     "item_description": unreserved_item["item_description"],
                 },
-                "message": "Item unreserved successfully."
+                "message": message
             })
         else:
-            return jsonify({"success": False, "message": "Failed to unreserve item."}), 400
+            return jsonify({"success": False, "message": message}), 400
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

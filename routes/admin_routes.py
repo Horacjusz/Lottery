@@ -18,10 +18,8 @@ def admin_dashboard():
         user_id = session[USER_ID]
         visible = is_visible(user_id)
         users_data = get_all_users()
-        for user_data_id in users_data : print(users_data[user_data_id])
         items_data = get_all_items()
-        for item_data_id in items_data : print(items_data[item_data_id])
-        return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), users_data = users_data, items_data = items_data, error_message = "")
+        return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), users_data = users_data, items_data = items_data, error_message = "", admin_id = user_id)
     else:
         flash("Brak dostępu: musisz być administratorem.", "error")
         return redirect(url_for("auth.login"))

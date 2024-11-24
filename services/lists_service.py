@@ -23,5 +23,4 @@ def get_all_items() :
     items = {}
     for ID in ids :
         items[ID] = (load_item_data(ID))
-        print(items[ID])
     return items

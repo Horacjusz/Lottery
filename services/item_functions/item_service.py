@@ -89,23 +89,21 @@ def unreserve_item(item_id) :
     print("unreserving", item_id)
     if not check_item_existence(item_id) :
         print(f"Item {item_id} does not exist")
-        return False
+        return False, "Przedmiot nie istnieje"
     item_data = load_item_data(item_id)
     print(item_data)
     if item_data[BOUGHT] :
         print("Cannot unreserve item, because it was already bought")
-        return False
+        return False, "Najpierw usuń przedmiot z listy kupionych jeśli chcesz zrezygnować z rezerwacji"
     user_id = item_data[RESERVED_BY]
     item_data[RESERVED_BY] = None
     save_item_data(item_data)
-    if user_id is None : 
-        print(f"Item {item_id} has been unreserved")
-        return item_data
-    user_data = load_user_data(user_id)
-    user_data[RESERVED_ITEMS].remove(item_id)
-    save_user_data(user_data)
+    if user_id is not None :
+        user_data = load_user_data(user_id)
+        user_data[RESERVED_ITEMS].remove(item_id)
+        save_user_data(user_data)
     print(f"Item {item_id} has been unreserved")
-    return item_data
+    return item_data, "Przedmiot usunięty z listy zarezerwowanych"
 
 def toggle_buy_item(item_id) :
     check_item_existence(item_id)

@@ -140,13 +140,11 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                // Correctly remove the item from the wishlist
                 const wishlistRow = document.querySelector(`#wishlist-${data.owner_id} tr[data-item-id="${item_id}"]`);
                 if (wishlistRow) {
                     wishlistRow.remove();
                 }
 
-                // Add the item to the reserved table if on_dashboard is true
                 if (on_dashboard) {
                     const reservedTableBody = document.querySelector(`#reserved-table-${user_id} tbody`);
                     const reservedRow = `
@@ -167,7 +165,6 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
                     reservedTableBody.insertAdjacentHTML("beforeend", reservedRow);
 
                     console.log("user_id")
-                    // Hide "no reserved items" message if there are items now
                     const noReservedItemsMessage = document.getElementById("no-reserved-items");
                     if (noReservedItemsMessage) {
                         noReservedItemsMessage.style.display = "none";
@@ -204,13 +201,11 @@ function unreserveItem(event, item_id, on_dashboard) {
             if (data.success) {
                 const { user_id, item } = data;
 
-                // Remove the item from the reserved table
                 const reservedRow = document.querySelector(`#reserved-table-${user_id} tr[data-item-id="${item_id}"]`);
                 if (reservedRow) {
                     reservedRow.remove();
                 }
 
-                // Show "no reserved items" message if the reserved table is empty
                 const reservedTableBody = document.querySelector(`#reserved-table-${user_id} tbody`);
                 const noReservedItemsMessage = document.getElementById("no-reserved-items");
                 if (!reservedTableBody || !reservedTableBody.querySelector("tr")) {
@@ -219,7 +214,7 @@ function unreserveItem(event, item_id, on_dashboard) {
                     noReservedItemsMessage.style.display = "none";
                 }
             } else {
-                alert(data.error || "Error unreserving item.");
+                alert(data.message || "Nie można usunąć przedmiotu z listy zarezerwowanych. Może jest oznaczony jako kupiony?");
             }
         })
         .catch((error) => {
@@ -227,9 +222,6 @@ function unreserveItem(event, item_id, on_dashboard) {
             alert("An error occurred while processing the unreserve request.");
         });
 }
-
-
-
 
 
 function toggleBought(event, item_id) {
@@ -247,7 +239,6 @@ function toggleBought(event, item_id) {
             if (data.success) {
                 const reservedRow = document.querySelector(`tr[data-item-id="${item_id}"]`);
                 if (reservedRow) {
-                    // Toggle the green background based on the new bought status
                     if (data.bought) {
                         reservedRow.classList.add("reserved-green");
                     } else {
@@ -255,7 +246,6 @@ function toggleBought(event, item_id) {
                     }
                 }
 
-                // Update the cell style for the reserved status
                 const reservedCell = document.querySelector(`#reserved-table-${item_id}-accept`);
                 if (reservedCell) {
                     if (data.bought) {
