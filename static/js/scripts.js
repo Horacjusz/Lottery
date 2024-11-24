@@ -308,7 +308,7 @@ function saveItem(event, item_id) {
     const descInput = row.querySelector(".edit-description");
 
     const newName = nameInput.value.trim();
-    const newDescription = descInput.value.trim();
+    var newDescription = descInput.value.trim();
 
     if (!newDescription) {
         newDescription = " ";
