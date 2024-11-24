@@ -292,8 +292,8 @@ function editItem(event, item_id, itemName, itemDescription) {
     const nameCell = row.querySelector(".item-name");
     const descCell = row.querySelector(".item-description");
 
-    nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name">`;
-    descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
+    nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name" required>`;
+    descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description" required>`;
 
     const editIconCell = row.querySelector(".edit-icon").parentElement;
     editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, ${item_id})">💾</span>`;
@@ -304,8 +304,16 @@ function saveItem(event, item_id) {
     event.stopPropagation();
 
     const row = event.target.closest("tr");
-    const newName = row.querySelector(".edit-name").value;
-    const newDescription = row.querySelector(".edit-description").value;
+    const nameInput = row.querySelector(".edit-name");
+    const descInput = row.querySelector(".edit-description");
+
+    const newName = nameInput.value.trim();
+    const newDescription = descInput.value.trim();
+
+    if (!newName || !newDescription) {
+        alert("Nazwa i opis przedmiotu nie mogą być puste.");
+        return;
+    }
 
     fetch(`/items/edit/${item_id}`, {
         method: "POST",
@@ -320,16 +328,13 @@ function saveItem(event, item_id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-
-            // Update the row with the new data
             row.querySelector(".item-name").innerText = newName;
             row.querySelector(".item-description").innerText = newDescription;
 
-            // Change save icon back to edit icon
             const saveIconCell = row.querySelector(".save-icon").parentElement;
             saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, ${item_id}, '${newName}', '${newDescription}')">✎</span>`;
         } else {
-            alert(data.error || "Error saving changes.");
+            alert(data.error || "Błąd podczas zapisywania - pamiętaj, że przedmiot musi mieć nazwę i opis");
         }
     })
     .catch(error => {
