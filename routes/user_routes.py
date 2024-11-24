@@ -3,7 +3,7 @@ from services.user_functions.user_service import edit_user, check_user_existence
 from settings.tokens import *
 from flask import Blueprint, render_template, request
 from services.user_functions.user_service import create_user, delete_user
-from services.file_service import load_settings
+from services.file_service import load_settings, load_user_data
 from services.lists_service import get_all_users, get_all_items
 
 user_blueprint = Blueprint("user", __name__, template_folder="templates")
@@ -96,6 +96,7 @@ def is_username_free():
 def user_list():
     
     user_id = session[USER_ID]
+    user_spouse = load_user_data(user_id)[SPOUSE]
     
     return render_template("user_list.html", users=get_all_users().values(), user_id=user_id, items_data = get_all_items())
 

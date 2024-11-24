@@ -14,7 +14,14 @@
             {% set user_id = user.user_ID %}
             <h2>Witaj, {{ user.name }}!</h2>
             <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.<br>Jeśli chcesz skontaktować się z administratorem jest nim Paweł</p>
-
+            <p>
+                <strong>Legenda:<br></strong>
+                <strong>×</strong> - usuń / zrezygnuj z rezerwacji<br>
+                <strong>✔</strong> - zarezerwuj przedmiot<br>
+                <strong>✎</strong> - edytuj przedmiot<br>
+                <strong>💾</strong> - zapisz przedmiot<br>
+            </p>
+            
             {% if user.choosable %}
             <div class="section">
                 <h3>Losowanie</h3>
