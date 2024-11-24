@@ -293,7 +293,7 @@ function editItem(event, item_id, itemName, itemDescription) {
     const descCell = row.querySelector(".item-description");
 
     nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name" required>`;
-    descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description" required>`;
+    descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
 
     const editIconCell = row.querySelector(".edit-icon").parentElement;
     editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, ${item_id})">💾</span>`;
