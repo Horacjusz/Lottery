@@ -1,104 +1,104 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel użytkownika</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
-</head>
-<body>
-    <div class="dashboard-container">
-        {% set admin = false %}
-        {% set on_dashboard = true %}
-        {% set user_id = user.user_ID %}
-        <h2>Witaj, {{ user.name }}!</h2>
-        <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.<br>Jeśli chcesz skontaktowac się z administratorem jest nim Paweł</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Panel użytkownika</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+        <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+    </head>
+    <body>
+        <div class="dashboard-container">
+            {% set admin = false %}
+            {% set on_dashboard = true %}
+            {% set user_id = user.user_ID %}
+            <h2>Witaj, {{ user.name }}!</h2>
+            <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.<br>Jeśli chcesz skontaktować się z administratorem jest nim Paweł</p>
 
-        {% if user.choosable %}
-        <div class="section">
-            <h3>Losowanie</h3>
-                {% if user.assignment is none %}
-                    <p id="assignment-{{ user_id }}">
-                        Musisz kogoś wylosować
-                    </p>
-                {% else %}
-                    {% set assignment = users_data[user.assignment] %}
-                    
-                    <div class="assigned-user-info">
-                        <p>
-                            <strong>Wylosowano:</strong>
-
-                            <p id="assignment-{{ user_id }}", class = "user-name">
-                                {{ assignment.name }}
-                            </p>
-                        </p>
-                        {% include 'partials/wishlist.html' %}
-                    </div>
-                {% endif %}
-            {% include 'partials/draw_button.html' %}
-        </div>
-        {% endif %}
-        
-        <div class="section">
-            <h3>Twoje zarezerwowane przedmioty:</h3>
-            <p>
-                {% set reserved_items = user.reserved_items %}
-                {% include 'partials/reserved_items.html' %}
-            </p>
-        </div>
-
-
-        <div class="section">
-            <a href="{{ url_for('user.user_list') }}" class="dashboard-link">Lista Użytkowników</a>
-        </div>
-
-        <div class="section">
-            <h3>Twoja lista życzeń:</h3>
-            {% set wishlist = user.wishlist %}
-            <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
-            
-            {% include 'partials/own_wishlist.html' %}
-        </div>
-
-        <div class="section">
-            <h3>Małżonek</h3>
-                {% if user.spouse is none %}
-                    <p id="assignment-{{ user_id }}">
-                        Nie posiadasz małżonka - Jeśli chcesz, żeby ktoś sie tu pojawił, spoczekaj aż stworzy konto lub poszukaj go na stronie edycji danych
-                    </p>
-                {% else %}
-                    {% set assignment = users_data[user.spouse] %}
-                    
-                    <div class="assigned-user-info">
-                        <p>
-                            <strong>Twoim małżonkiem jest:</strong>
-
-                            <p id="assignment-{{ user_id }}", class = "user-name">
-                                {{ assignment.name }}
-                            </p>
-                        </p>
-                        {% include 'partials/wishlist.html' %}
-                    </div>
-                {% endif %}
-        </div>
-
-        <div class="section">
-            <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
-        </div>
-
-        <div class="section">
-            <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Wyloguj się</a>
-        </div>
-
-        <p>Jeśli chcesz z jakiegoś powodu usunąć swoje konto skontaktuj się z administratorem</p>
-
-        {% if user.admin %}
+            {% if user.choosable %}
             <div class="section">
-                <a href="{{ url_for('admin.admin_dashboard') }}" class="dashboard-link">Panel Administratora</a>
-            </div>
-        {% endif %}
-    </div>
+                <h3>Losowanie</h3>
+                    {% if user.assignment is none %}
+                        <p id="assignment-{{ user_id }}">
+                            Musisz kogoś wylosować
+                        </p>
+                    {% else %}
+                        {% set assignment = users_data[user.assignment] %}
+                        
+                        <div class="assigned-user-info">
+                            <p>
+                                <strong>Wylosowano:</strong>
 
-</body>
+                                <p id="assignment-{{ user_id }}", class = "user-name">
+                                    {{ assignment.name }}
+                                </p>
+                            </p>
+                            {% include 'partials/wishlist.html' %}
+                        </div>
+                    {% endif %}
+                {% include 'partials/draw_button.html' %}
+            </div>
+            {% endif %}
+            
+            <div class="section">
+                <h3>Twoje zarezerwowane przedmioty:</h3>
+                <p>
+                    {% set reserved_items = user.reserved_items %}
+                    {% include 'partials/reserved_items.html' %}
+                </p>
+            </div>
+
+
+            <div class="section">
+                <a href="{{ url_for('user.user_list') }}" class="dashboard-link">Lista Użytkowników</a>
+            </div>
+
+            <div class="section">
+                <h3>Twoja lista życzeń:</h3>
+                {% set wishlist = user.wishlist %}
+                <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
+                
+                {% include 'partials/own_wishlist.html' %}
+            </div>
+
+            <div class="section">
+                <h3>Małżonek</h3>
+                    {% if user.spouse is none %}
+                        <p id="assignment-{{ user_id }}">
+                            <strong>Nie posiadasz małżonka</strong><br>Jeśli chcesz, żeby ktoś się tu pojawił, poczekaj aż stworzy konto lub poszukaj go na stronie edycji danych
+                        </p>
+                    {% else %}
+                        {% set assignment = users_data[user.spouse] %}
+                        
+                        <div class="assigned-user-info">
+                            <p>
+                                <strong>Twoim małżonkiem jest:</strong>
+
+                                <p id="assignment-{{ user_id }}", class = "user-name">
+                                    {{ assignment.name }}
+                                </p>
+                            </p>
+                            {% include 'partials/wishlist.html' %}
+                        </div>
+                    {% endif %}
+            </div>
+
+            <div class="section">
+                <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
+            </div>
+
+            <div class="section">
+                <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Wyloguj się</a>
+            </div>
+
+            <p>Jeśli chcesz z jakiegoś powodu usunąć swoje konto skontaktuj się z administratorem</p>
+
+            {% if user.admin %}
+                <div class="section">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="dashboard-link">Panel Administratora</a>
+                </div>
+            {% endif %}
+        </div>
+
+    </body>
 </html>
