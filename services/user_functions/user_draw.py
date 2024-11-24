@@ -1,5 +1,5 @@
 from services.retrieval import get_all_ids
-from services.file_service import load_user_file
+from services.file_service import load_user_data
 from services.permutation_service import kth_permutation_fast, random_permutation
 from math import factorial
 from settings.tokens import *
@@ -8,7 +8,7 @@ def get_all_ch(oosers = True) :
     ids = get_all_ids(USERS)
     ch = []
     for ID in ids :
-        user = load_user_file(ID)
+        user = load_user_data(ID)
         if user[CHOOSABLE] and user[VISIBLE] :
             check_val = user[ASSIGNED_TO]
             if oosers :
@@ -24,8 +24,8 @@ def get_all_choosable() :
     return get_all_ch(oosers = False)
 
 def can_be_assigned(user_id, assignment_id) :
-    user_spouse = load_user_file(user_id)[SPOUSE]
-    assignment_spouse = load_user_file(assignment_id)[SPOUSE]
+    user_spouse = load_user_data(user_id)[SPOUSE]
+    assignment_spouse = load_user_data(assignment_id)[SPOUSE]
     
     identity_fail = user_id == assignment_id
     spouse_fail = user_id == assignment_spouse or user_spouse == assignment_id

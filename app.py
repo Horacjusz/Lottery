@@ -63,4 +63,4 @@ def prepare_app() :
 
 if __name__ == "__main__":
     prepare_app()
-    app.run(debug = os.getenv("FLASK_ENV") == "development", port = int(os.getenv("PORT", 10000)), host = '0.0.0.0')
+    app.run(debug = os.getenv("FLASK_ENV") == "development", port = int(os.getenv("PORT", 5000)), host = '0.0.0.0')

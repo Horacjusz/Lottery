@@ -2,7 +2,11 @@
     <tbody>
         {% for item_id in reserved_items %}
             {% set item = items_data[item_id] %}
-            <tr class="reserved-item {% if item.bought %}reserved-green{% endif %}" data-item-id="{{ item_id }}">
+            <tr class="reserved-item 
+                {% if item.bought %}
+                    reserved-green
+                {% endif %}" 
+                data-item-id="{{ item_id }}">
                 <td>
                     <span class="item-name">{{ item.item_name }}</span>
                     <span class="item-description">{{ item.item_description | linkify | safe }}</span>

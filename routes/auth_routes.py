@@ -63,7 +63,7 @@ def verify_password() :
     
     password = request.form[PASSWORD]
     
-    user_data = load_user_file(user_id)
+    user_data = load_user_data(user_id)
     
     user_password = user_data[PASSWORD]
     

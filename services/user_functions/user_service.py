@@ -1,5 +1,5 @@
 from services.retrieval import get_free_id, get_all_ids
-from services.file_service import save_user_file, load_user_file
+from services.file_service import save_user_data, load_user_data
 from settings.tokens import *
 from settings.settings import DEFAULT_PASSWORD, DEFAULT_NAME
 from services.database import datasession
@@ -49,12 +49,12 @@ def create_user(user_data = None) :
     if not user_data[VISIBLE] :
         user_data[CHOOSABLE] = False
     
-    save_user_file(user_data)
+    save_user_data(user_data)
     return user_data
 
 def print_user(user_id) :
     check_user_existence(user_id)
-    print(load_user_file(user_id))
+    print(load_user_data(user_id))
     
 def print_all_users() :
     for Id in get_all_ids(USERS) :
@@ -144,7 +144,7 @@ def delete_user(user_id):
         return False
 
 def assign(user_id, assignment_id) :
-    user_data = load_user_file(user_id)
+    user_data = load_user_data(user_id)
     old_assignment = user_data[ASSIGNMENT]
     if old_assignment is not None :
         edit_user(old_assignment, reset_assigned_to = True)
@@ -152,7 +152,7 @@ def assign(user_id, assignment_id) :
     edit_user(assignment_id, new_assigned_to = user_id)
     
 def unassign(user_id) :
-    user_data = load_user_file(user_id)
+    user_data = load_user_data(user_id)
     old_assignment = user_data[ASSIGNMENT]
     if old_assignment is not None :
         edit_user(old_assignment, reset_assigned_to = True)
@@ -175,7 +175,7 @@ def edit_user(user_id,
               new_password = None
               ) :
     check_user_existence(user_id)
-    user_data = load_user_file(user_id)
+    user_data = load_user_data(user_id)
     if new_name is not None :
         user_data[NAME] = new_name
     if new_username is not None :
@@ -209,26 +209,26 @@ def edit_user(user_id,
     if not user_data[VISIBLE] :
         user_data[CHOOSABLE] = False
     
-    save_user_file(user_data)
+    save_user_data(user_data)
     return user_data
 
 def marriage(user_id, spouse_id = None) :
-    user_data = load_user_file(user_id)
+    user_data = load_user_data(user_id)
     prev_spouse = user_data[SPOUSE]
     if prev_spouse == spouse_id : return
     if prev_spouse is not None :
-        prev_spouse_data = load_user_file(prev_spouse)
+        prev_spouse_data = load_user_data(prev_spouse)
         prev_spouse_data[SPOUSE] = None
-        save_user_file(prev_spouse_data)
+        save_user_data(prev_spouse_data)
     if spouse_id is not None :
-        spouse_data = load_user_file(spouse_id)
+        spouse_data = load_user_data(spouse_id)
         prev_spouse_spouse_id = spouse_data[SPOUSE]
         spouse_data[SPOUSE] = user_id
         if prev_spouse_spouse_id is not None :
-            prev_spouse_spouse_data = load_user_file(prev_spouse_spouse_id)
+            prev_spouse_spouse_data = load_user_data(prev_spouse_spouse_id)
             prev_spouse_spouse_data[SPOUSE] = None
-            save_user_file(prev_spouse_spouse_data)
-        save_user_file(spouse_data)
+            save_user_data(prev_spouse_spouse_data)
+        save_user_data(spouse_data)
     user_data[SPOUSE] = spouse_id
-    save_user_file(user_data)
+    save_user_data(user_data)
     return

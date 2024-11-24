@@ -1,7 +1,7 @@
 from services.file_service import load_settings
 from services.user_functions.user_draw import get_all_choosable, get_all_choosers, generate_valid_assignment
 from services.user_functions.user_service import assign, check_user_existence
-from services.file_service import load_user_file, load_item_file, save_user_file, save_item_file
+from services.file_service import load_user_data, load_item_data, save_user_data, save_item_data
 from services.item_functions.item_service import delete_item
 from settings.tokens import *
 from services.lists_service import get_all_users
@@ -16,7 +16,7 @@ def main_draw(user_id) :
     if not check_user_existence(user_id) :
         return None
     
-    user_data = load_user_file(user_id)
+    user_data = load_user_data(user_id)
     
     if not user_data[CHOOSABLE] :
         print("User", user_id, "does not participate in lottery")
@@ -49,12 +49,12 @@ def main_draw(user_id) :
 def reset_draw() :
     for user in get_all_users().values() :
         for item_id in user[RESERVED_ITEMS] :
-            item_data = load_item_file(item_id)
+            item_data = load_item_data(item_id)
             if item_data[BOUGHT] :
                 item_data[BOUGHT] = False
-                save_item_file(item_data)
+                save_item_data(item_data)
                 delete_item(item_id)
-        user = load_user_file(user[USER_ID])
+        user = load_user_data(user[USER_ID])
         user[ASSIGNMENT] = None
         user[ASSIGNED_TO] = None
-        save_user_file(user)
+        save_user_data(user)

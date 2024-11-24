@@ -2,8 +2,27 @@ from models.models import User, Item, Setting
 from services.database import datasession
 from settings.tokens import *
 
-def save_user_file(user_data):
-    user = datasession.query(User).filter_by(user_id=user_data[USER_ID]).first()
+
+def get_user_database(user_id) :
+    try :
+        user = datasession.query(User).filter_by(user_id=user_id).first()
+        if user : return user
+    except Exception as e :
+        print(f"User with ID {user_id} not found in the database.\n->{e}")
+    return None
+
+def get_item_dtabase(item_id) :
+    try :
+        item = datasession.query(Item).filter_by(item_id=item_id).first()
+        if item:
+            return item
+    except Exception as e :
+        print(f"Item with ID {item_id} not found in the database.\n->{e}")
+    return None
+
+
+def save_user_data(user_data):
+    user = get_user_database(user_data[USER_ID])
     if not user:
         user = User(user_id=user_data[USER_ID])
     user.name = user_data.get("name")
@@ -20,11 +39,59 @@ def save_user_file(user_data):
     datasession.add(user)
     datasession.commit()
 
+def check_user_value(value) :
+    data = load_user_as_dict(value)
+    if data is None : return None
+    return data[USER_ID]
 
-def load_user_file(user_id):
-    user = datasession.query(User).filter_by(user_id=user_id).first()
-    if user:
-        return {
+def load_user_data(user_id) :
+    user_data = load_user_as_dict(user_id)
+    if user_data is None : return None
+    for item_id in user_data[WISHLIST] :
+        item_data = load_item_data(item_id)
+        if item_data is None :
+            print(f"Item with ID {item_id} not found in the database.")
+            user_data[WISHLIST].remove(item_id)
+    for item_id in user_data[RESERVED_ITEMS] :
+        item_data = load_item_data(item_id)
+        if item_data is None :
+            print(f"Item with ID {item_id} not found in the database.")
+            user_data[RESERVED_ITEMS].remove(item_id)
+            
+    user_data[ASSIGNMENT] = check_user_value(user_data[ASSIGNMENT])
+    user_data[ASSIGNED_TO] = check_user_value(user_data[ASSIGNED_TO])
+    user_data[SPOUSE] = check_user_value(user_data[SPOUSE])
+            
+    save_user_data(user_data)
+    return user_data
+
+def load_item_data(item_id) :
+    item_data = load_item_as_dict(item_id)
+    if item_data is None : return None
+    if not isinstance(item_data[OWNER_ID], int) :
+        print(f"Invalid OWNER_ID: {item_data[OWNER_ID]} (must be an integer).")
+        delete_item_data(item_id)
+        return None
+    owner_exists = get_user_database(item_data[OWNER_ID])
+    if not owner_exists :
+        print(f"User with ID {item_data[OWNER_ID]} (OWNER_ID) not found in the database.")
+        delete_item_data(item_id)
+        return None
+    if item_data[RESERVED_BY] is not None :
+        if not isinstance(item_data[RESERVED_BY], int) :
+            print(f"Invalid RESERVED_BY: {item_data[RESERVED_BY]} (must be an integer or None).")
+            item_data[RESERVED_BY] = None
+        reserved_by_exists = get_user_database(item_data[RESERVED_BY])
+        if not reserved_by_exists :
+            print(f"User with ID {item_data[RESERVED_BY]} (RESERVED_BY) not found in the database.")
+            item_data[RESERVED_BY] = None
+    save_item_data(item_data)
+    return item_data
+
+def load_user_as_dict(user_id) :
+    user = get_user_database(user_id)
+    if user :
+        user_dict = {
             USER_ID: user.user_id,
             NAME: user.name,
             USERNAME: user.username,
@@ -38,15 +105,30 @@ def load_user_file(user_id):
             WISHLIST: user.wishlist,
             RESERVED_ITEMS: user.reserved_items,
         }
-    raise FileNotFoundError(f"User with ID {user_id} not found in the database.")
+        return user_dict
+    return None
 
 
-def delete_user_file(user_id):
+def load_item_as_dict(item_id) :
+    item = get_item_dtabase(item_id)
+    if item:
+        item_data = {
+            ITEM_ID: item.item_id,
+            ITEM_NAME: item.item_name,
+            ITEM_DESCRIPTION: item.item_description,
+            RESERVED_BY: item.reserved_by,
+            OWNER_ID: item.owner_id,
+            BOUGHT: item.bought,
+        }
+        return item_data
+    return None
+
+def delete_user_data(user_id):
     """
     Delete a user from the database by their ID.
     """
     try:
-        user = datasession.query(User).filter_by(user_id=user_id).first()
+        user = get_user_database(user_id)
         if user:
             datasession.delete(user)
             datasession.commit()
@@ -57,8 +139,8 @@ def delete_user_file(user_id):
         print(f"Error deleting user with ID {user_id}: {e}")
     
     
-def save_item_file(item_data):
-    item = datasession.query(Item).filter_by(item_id=item_data[ITEM_ID]).first()
+def save_item_data(item_data):
+    item = get_item_dtabase(item_data[ITEM_ID])
     if not item:
         item = Item(item_id=item_data[ITEM_ID])
     item.item_name = item_data.get("item_name")
@@ -69,27 +151,15 @@ def save_item_file(item_data):
     datasession.add(item)
     datasession.commit()
 
-
-def load_item_file(item_id):
-    item = datasession.query(Item).filter_by(item_id=item_id).first()
-    if item:
-        return {
-            ITEM_ID: item.item_id,
-            ITEM_NAME: item.item_name,
-            ITEM_DESCRIPTION: item.item_description,
-            RESERVED_BY: item.reserved_by,
-            OWNER_ID: item.owner_id,
-            BOUGHT: item.bought,
-        }
-    raise FileNotFoundError(f"Item with ID {item_id} not found in the database.")
+# def load_item_data(item_id):
 
 
-def delete_item_file(item_id):
+def delete_item_data(item_id):
     """
     Delete an item from the database by its ID.
     """
     try:
-        item = datasession.query(Item).filter_by(item_id=item_id).first()
+        item = get_item_dtabase(item_id)
         if item:
             datasession.delete(item)
             datasession.commit()
@@ -134,3 +204,23 @@ def save_settings(data):
         datasession.commit()
     except Exception as e:
         print(f"Error saving settings to database: {e}")
+        
+
+def get_all_ids(kind, include_zero=False):
+    ids = []
+    try:
+        if kind == USERS:
+            query = datasession.query(User.user_id)
+        elif kind == ITEMS:
+            query = datasession.query(Item.item_id)
+        else:
+            raise ValueError("Invalid kind specified. Must be USERS or ITEMS.")
+        
+        ids = [row[0] for row in query.all()]
+        
+        if not include_zero:
+            ids = [id for id in ids if id != 0]
+    except Exception as e:
+        print(f"Error querying IDs from the database: {e}")
+    
+    return sorted(ids)

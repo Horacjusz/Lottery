@@ -12,12 +12,12 @@ class User(Base):
     password = Column(String, nullable=False)
     visible = Column(Boolean, default=True)
     choosable = Column(Boolean, default=True)
-    spouse = Column(Integer, ForeignKey('users.user_id'))
-    assignment = Column(Integer)
-    assigned_to = Column(Integer)
+    spouse = Column(Integer, ForeignKey('users.user_id')) # Dependent
+    assignment = Column(Integer) # Dependent
+    assigned_to = Column(Integer) # Dependent
     admin = Column(Boolean, default=False)
-    wishlist = Column(JSON, default=[])
-    reserved_items = Column(JSON, default=[])
+    wishlist = Column(JSON, default=[]) # Dependent
+    reserved_items = Column(JSON, default=[]) # Dependent
 
 
 class Item(Base):
@@ -26,8 +26,8 @@ class Item(Base):
     item_id = Column(Integer, primary_key=True)
     item_name = Column(String, nullable=False)
     item_description = Column(String, default="")
-    reserved_by = Column(Integer, ForeignKey('users.user_id'))
-    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    reserved_by = Column(Integer, ForeignKey('users.user_id')) # Dependent
+    owner_id = Column(Integer, ForeignKey('users.user_id'), nullable=False) # Dependent
     bought = Column(Boolean, default=False)
 
 class Setting(Base):

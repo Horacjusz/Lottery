@@ -3,7 +3,7 @@ from services.verification import is_visible
 from services.file_service import load_settings, save_settings
 from services.lists_service import get_available_spouses, get_all_users, get_all_items
 from services.item_functions.item_service import reserve_item, delete_item, edit_item, unreserve_item, toggle_buy_item, create_item
-from services.file_service import load_item_file
+from services.file_service import load_item_data
 from settings.tokens import *
 
 item_blueprint = Blueprint("item", __name__, template_folder="templates")
@@ -45,7 +45,7 @@ def reserve_item_route(user_id, item_id):
 @item_blueprint.route("/unreserve/<int:item_id>", methods=["POST"])
 def unreserve_item_route(item_id):
     try:
-        user_id = load_item_file(item_id)[RESERVED_BY]
+        user_id = load_item_data(item_id)[RESERVED_BY]
 
         unreserved_item = unreserve_item(item_id)
         if unreserved_item:
