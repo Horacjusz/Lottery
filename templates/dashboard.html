@@ -13,7 +13,7 @@
         {% set on_dashboard = true %}
         {% set user_id = user.user_ID %}
         <h2>Witaj, {{ user.name }}!</h2>
-        <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.</p>
+        <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.<br>Jeśli chcesz skontaktowac się z administratorem jest nim Paweł</p>
 
         <div class="section">
             <h3>Losowanie</h3>
@@ -25,12 +25,10 @@
                 {% else %}
                     {% set assignment = users_data[user.assignment] %}
                     
-                    <!-- If an assignment exists, display the assigned user's information in a two-column table -->
                     <div class="assigned-user-info">
                         <p>
                             <strong>Wylosowano:</strong>
 
-                            <!-- Assignment Display -->
                             <p id="assignment-{{ user_id }}", class = "user-name">
                                 {{ assignment.name }}
                             </p>
