@@ -4,10 +4,8 @@ function linkify(text) {
 }
 
 function checkForSymbols(inputString) {
-    // Zbiór niebezpiecznych symboli
-    const dangerousSymbols = ["'", '"', '<', '>', '&'];
+    const dangerousSymbols = ["'", '"', '<', '>', '&', "(", ")", "[", "]", "{", "}"];
 
-    // Sprawdzanie, czy string zawiera któryś z symboli
     for (const symbol of dangerousSymbols) {
         if (inputString.includes(symbol)) {
             alert(`Niedozwolony symbol ${symbol} w napisie ${inputString}`);
