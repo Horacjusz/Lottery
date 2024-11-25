@@ -52,6 +52,8 @@ def delete_item(item_id) :
     user_data = load_user_data(item_data[OWNER_ID])
     user_data[WISHLIST].remove(item_id)
     save_user_data(user_data)
+    item_data[BOUGHT] = False
+    save_item_data(item_data)
     unreserve_item(item_id)
     delete_item_data(item_id)
     return True

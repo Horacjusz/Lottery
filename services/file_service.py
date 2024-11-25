@@ -133,10 +133,13 @@ def delete_user_data(user_id):
             datasession.delete(user)
             datasession.commit()
             print(f"User with ID {user_id} deleted.")
+            return True
         else:
             print(f"User with ID {user_id} does not exist.")
+            return True
     except Exception as e:
         print(f"Error deleting user with ID {user_id}: {e}")
+        return False
     
     
 def save_item_data(item_data):

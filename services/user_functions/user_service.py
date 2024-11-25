@@ -1,5 +1,5 @@
 from services.retrieval import get_free_id, get_all_ids
-from services.file_service import save_user_data, load_user_data
+from services.file_service import save_user_data, load_user_data, delete_user_data
 from settings.tokens import *
 from settings.settings import DEFAULT_PASSWORD, DEFAULT_NAME
 from services.database import datasession
@@ -61,40 +61,34 @@ def print_all_users() :
         print_user(Id)
   
   
-# Unsafe to use -> for future development
 def delete_user(user_id):
     
     if not check_user_existence(user_id):
         print("User", user_id, "does not exist.")
         return True
 
-    user = datasession.query(User).filter_by(user_id=user_id).first()
+    user_data = load_user_data(user_id)
     
-    
-    if not user:
+    if not user_data:
         print(f"User {user_id} does not exist in the database.")
         return True
 
-    print(user.assigned_to)
-    print(user.assignment)
-
-    if user.assigned_to is not None and user.assignment is not None :
-        if user.assigned_to is not None and user.assignment is None:
-            assignment_id = user.assigned_to
+    if user_data[ASSIGNED_TO] is not None and user_data[ASSIGNMENT] is not None :
+        from services.draw_service import generate_valid_assignment
+        if user_data[ASSIGNED_TO] is not None and user_data[ASSIGNMENT] is None:
+            assignment_id = user_data[ASSIGNED_TO]
             edit_user(assignment_id, reset_assignment=True)
             edit_user(user_id, reset_assigned_to=True)
-            from services.draw_service import generate_valid_assignment
             if generate_valid_assignment() is None:
                 edit_user(assignment_id, new_assignment=user_id)
                 edit_user(user_id, new_assigned_to=assignment_id)
                 print("Cannot delete user due to assignment clutch")
                 return False
-        elif user.assignment is not None and user.assigned_to is None:
-            assignment_id = user.assignment
+        elif user_data[ASSIGNMENT] is not None and user_data[ASSIGNED_TO] is None:
+            assignment_id = user_data[ASSIGNMENT]
             edit_user(assignment_id, reset_assigned_to=True)
             edit_user(user_id, reset_assignment=True)
 
-            from services.draw_service import generate_valid_assignment
             if generate_valid_assignment() is None:
                 edit_user(assignment_id, new_assigned_to=user_id)
                 edit_user(user_id, new_assignment=assignment_id)
@@ -102,29 +96,24 @@ def delete_user(user_id):
                 return False
         else :
             from services.user_functions.user_draw import can_be_assigned
-            if can_be_assigned(user.assigned_to, user.assignment):
-                assigned_to = user.assigned_to
-                assignment = user.assignment
+            if can_be_assigned(user_data[ASSIGNED_TO], user_data[ASSIGNMENT]):
+                assigned_to = user_data[ASSIGNED_TO]
+                assignment = user_data[ASSIGNMENT]
                 edit_user(assigned_to, new_assignment=assignment)
                 edit_user(assignment, new_assigned_to=assigned_to)
             else:
                 print("Cannot delete user due to assignment clutch")
                 return False
-
+            
     
     from services.item_functions.item_service import delete_item, unreserve_item
-    from models.models import Item
-    for item_id in user.reserved_items:
+    for item_id in user_data[RESERVED_ITEMS] :
         unreserve_item(item_id)
 
-    # Handle items related to the user
-    from services.item_functions.item_service import delete_item, unreserve_item
-    items = datasession.query(Item).filter_by(owner_id=user_id).all()
 
-    for item in items:
-        datasession.delete(item)  # Remove items from the database
+    for item_id in user_data[WISHLIST] :
+        delete_item(item_id)
 
-    # Commit deletion of items before attempting to delete the user
     try:
         datasession.commit()
     except Exception as e:
@@ -132,16 +121,7 @@ def delete_user(user_id):
         print(f"Failed to delete items for user {user_id}: {e}")
         return False
 
-    # Finally, delete the user
-    try:
-        datasession.delete(user)
-        datasession.commit()
-        print(f"User {user_id} has been deleted.")
-        return True
-    except Exception as e:
-        datasession.rollback()
-        print(f"Failed to delete user {user_id}: {e}")
-        return False
+    return delete_user_data(user_id)
 
 def assign(user_id, assignment_id) :
     user_data = load_user_data(user_id)
