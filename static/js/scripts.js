@@ -3,6 +3,20 @@ function linkify(text) {
     return text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
 }
 
+function checkForSymbols(inputString) {
+    // Zbiór niebezpiecznych symboli
+    const dangerousSymbols = ["'", '"', '<', '>', '&'];
+
+    // Sprawdzanie, czy string zawiera któryś z symboli
+    for (const symbol of dangerousSymbols) {
+        if (inputString.includes(symbol)) {
+            alert(`Niedozwolony symbol ${symbol} w napisie ${inputString}`);
+            return false;
+        }
+    }
+    return true;
+
+}
 
 function submitDrawForm(user_id) {
     const form = document.getElementById(`draw-form-${user_id}`);
@@ -291,9 +305,9 @@ function editItem(event, item_id, itemName, itemDescription) {
     const row = event.target.closest("tr");
     const nameCell = row.querySelector(".item-name");
     const descCell = row.querySelector(".item-description");
-
     nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name" required>`;
     descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
+
 
     const editIconCell = row.querySelector(".edit-icon").parentElement;
     editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, ${item_id})">💾</span>`;
@@ -309,6 +323,9 @@ function saveItem(event, item_id) {
 
     const newName = nameInput.value.trim();
     var newDescription = descInput.value.trim();
+    
+    if (!checkForSymbols(newName)) {return;}
+    if (!checkForSymbols(newDescription)) {return;}
 
     if (!newDescription) {
         newDescription = " ";
@@ -331,8 +348,9 @@ function saveItem(event, item_id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            row.querySelector(".item-name").innerText = newName;
-            row.querySelector(".item-description").innerText = newDescription;
+
+            row.querySelector(".item-name").innerText = escapeHTML(newName);
+            row.querySelector(".item-description").innerText = escapeHTML(newDescription);
 
             const saveIconCell = row.querySelector(".save-icon").parentElement;
             saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, ${item_id}, '${newName}', '${newDescription}')">✎</span>`;
@@ -385,18 +403,25 @@ function removeItem(event, item_id) {
 function addItem(event, owner_id) {
     event.preventDefault()
     const itemInput = document.getElementById(`wishlist_item-${owner_id}`);
-    const descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
+    var descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
 
     // Check if elements exist
-    if (!itemInput || !descriptionInput) {
+    if (!itemInput) {
         alert("Error: Missing input fields for adding items.");
         console.error(`Input fields not found for user ID: ${owner_id}`);
         return;
     }
 
+    if (!descriptionInput) {
+        descriptionInput = " ";
+    }
+
     const itemName = itemInput.value.trim();
     const itemDescription = descriptionInput.value.trim();
 
+    if (!checkForSymbols(itemName)) {return;}
+    if (!checkForSymbols(itemDescription)) {return;}
+    
     if (!itemName) {
         alert("Nazwa przedmiotu jest wymagana.");
         return;
@@ -439,6 +464,7 @@ function updateWishlist(owner_id, item) {
 
     const newRow = document.createElement("tr");
     newRow.setAttribute("data-item-id", item.item_id);
+
 
     newRow.innerHTML = `
         <td>
