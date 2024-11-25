@@ -96,7 +96,7 @@ def add_item_route():
     try:
         data = request.get_json()
         item_name = data.get("item_name")
-        item_description = data.get("item_description", " ")
+        item_description = data.get("item_description", "ㅤ")
         owner_id = data.get("owner_id")
         
         

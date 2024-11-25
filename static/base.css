@@ -230,10 +230,13 @@ a.back-link:hover {
     white-space: normal;
 }
 
+.item-name {
+    font-weight: bold;
+}
+
 .item-description {
-    font-size: 14px;
+    font-size: 13px;
     color: #888;
-    margin-top: 4px;
 }
 
 .item-owner {

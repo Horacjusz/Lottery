@@ -295,6 +295,14 @@ function toggleBought(event, item_id, user_id) {
         });
 }
 
+function cleanString(input) {
+    if (input.length === 1 && input === 'ㅤ') {
+        console.log("just filler")
+        return '';
+    }
+    return input;
+}
+
 
 
 
@@ -306,7 +314,7 @@ function editItem(event, item_id, itemName, itemDescription) {
     const nameCell = row.querySelector(".item-name");
     const descCell = row.querySelector(".item-description");
     nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name" required>`;
-    descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
+    descCell.innerHTML = `<input type="text" value="${cleanString(itemDescription)}" class="edit-description">`;
 
 
     const editIconCell = row.querySelector(".edit-icon").parentElement;
@@ -328,7 +336,7 @@ function saveItem(event, item_id) {
     if (!checkForSymbols(newDescription)) {return;}
 
     if (!newDescription) {
-        newDescription = " ";
+        newDescription = "ㅤ";
     }
     if (!newName) {
         alert("Nazwa przedmiotu nie może być pusta.");
@@ -349,8 +357,8 @@ function saveItem(event, item_id) {
     .then(data => {
         if (data.success) {
 
-            row.querySelector(".item-name").innerText = escapeHTML(newName);
-            row.querySelector(".item-description").innerText = escapeHTML(newDescription);
+            row.querySelector(".item-name").innerText = newName;
+            row.querySelector(".item-description").innerText = newDescription;
 
             const saveIconCell = row.querySelector(".save-icon").parentElement;
             saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, ${item_id}, '${newName}', '${newDescription}')">✎</span>`;
@@ -360,7 +368,7 @@ function saveItem(event, item_id) {
     })
     .catch(error => {
         console.error("Error:", error);
-        alert("An error occurred while saving the item.");
+        alert("Błąd podczas zapisywania przedmiotu");
     });
 }
 
@@ -421,7 +429,7 @@ function addItem(event, owner_id) {
 
     if (!checkForSymbols(itemName)) {return;}
     if (!checkForSymbols(itemDescription)) {return;}
-    
+
     if (!itemName) {
         alert("Nazwa przedmiotu jest wymagana.");
         return;
