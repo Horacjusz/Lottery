@@ -3,18 +3,6 @@ function linkify(text) {
     return text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
 }
 
-function checkForSymbols(inputString) {
-    const dangerousSymbols = ["'", '"', '<', '>', '&', "(", ")", "[", "]", "{", "}"];
-
-    for (const symbol of dangerousSymbols) {
-        if (inputString.includes(symbol)) {
-            alert(`Niedozwolony symbol ${symbol} w napisie ${inputString}`);
-            return false;
-        }
-    }
-    return true;
-
-}
 
 function submitDrawForm(user_id) {
     const form = document.getElementById(`draw-form-${user_id}`);
@@ -330,8 +318,6 @@ function saveItem(event, item_id) {
     const newName = nameInput.value.trim();
     var newDescription = descInput.value.trim();
     
-    if (!checkForSymbols(newName)) {return;}
-    if (!checkForSymbols(newDescription)) {return;}
 
     if (!newDescription) {
         newDescription = "ㅤ";
@@ -425,8 +411,6 @@ function addItem(event, owner_id) {
     const itemName = itemInput.value.trim();
     const itemDescription = descriptionInput.value.trim();
 
-    if (!checkForSymbols(itemName)) {return;}
-    if (!checkForSymbols(itemDescription)) {return;}
 
     if (!itemName) {
         alert("Nazwa przedmiotu jest wymagana.");
