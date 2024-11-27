@@ -40,6 +40,7 @@ function submitDrawForm(user_id) {
             } else {
                 assignmentElement.textContent = "Nie udało się nikogo znaleźć :c";
             }
+            location.reload();
         } else {
             alert("Failed to process the draw request.");
         }
@@ -49,6 +50,7 @@ function submitDrawForm(user_id) {
         alert("An error occurred while processing the draw request.");
     });
 }
+
 
 
 function resetLottery() {
