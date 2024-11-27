@@ -13,8 +13,7 @@
             {% for item in items_to_display %}
                 <tr data-item-id="{{ item.item_id }}" data-item="{{ item.item_id }}">
                     <td>
-                        <span class="item-name">{{ item.item_name }}</span>
-                        <span class="item-description">{{ item.item_description | linkify | safe }}</span>
+                        {% include 'partials/wishlist_item.html' %}
                     </td>
                     <td>
                         <span class="approve-icon" onclick="reserveItem(event, {{ user_id }}, {{ item.item_id }}, {{ on_dashboard | default('false') | lower }})">✔</span>

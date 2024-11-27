@@ -98,7 +98,7 @@ def user_list():
     user_id = session[USER_ID]
     user_spouse = load_user_data(user_id)[SPOUSE]
     
-    return render_template("user_list.html", users=get_all_users().values(), user_id=user_id, items_data = get_all_items(), user_spouse = user_spouse)
+    return render_template("user_list.html", users_data=get_all_users().values(), user_id=user_id, items_data = get_all_items(), user_spouse = user_spouse)
 
 
 

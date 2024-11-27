@@ -16,7 +16,7 @@
         </div>
 
         <div class="section">
-            {% for assignment in users %}
+            {% for assignment in users_data %}
                 {% if (assignment.user_ID != user_id) and (assignment.user_ID != user_spouse) %}
                     <div class="user-wishlist-section {% if loop.index == 1 %}highlighted-user{% endif %}">
                         <h3>{{ assignment.name }}</h3>
