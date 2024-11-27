@@ -7,9 +7,10 @@ import os
 import re
 from services.database import initialize_db
 from settings.settings import DEFAULT_SETTINGS
-from services.file_service import save_settings
+from services.file_service import save_settings, load_settings
 from routes.admin_routes import truncate_tables
 from dotenv import load_dotenv
+from settings.tokens import *
 
 from routes.auth_routes import auth_blueprint
 from routes.dashboard_routes import dashboard_blueprint
@@ -51,16 +52,25 @@ def refresh_session():
 
 def prepare_app() :
     debug = os.getenv("DEBUG") == "true"
-    # if debug : truncate_tables()
+    if debug : truncate_tables()
     initialize_db()
     save_settings(DEFAULT_SETTINGS)
     generate_owner()
     if debug :
+        n = 10
         from services.user_functions.user_service import create_user
-        for _ in range(0) :
+        for _ in range(n) :
             create_user()
+        from services.draw_service import main_draw
+        settings = load_settings()
+        settings[LOTTERY_ACTIVE] = True
+        save_settings(settings)
+        for i in range(n) :
+            main_draw(i + 1)
+            
     
 
 if __name__ == "__main__":
     prepare_app()
+    
     app.run(debug = os.getenv("DEBUG") == "true", port = int(os.getenv("PORT")), host = '0.0.0.0')

@@ -47,6 +47,15 @@
                                 </div>
                                 <div class="content user-content"><p><strong>ID:</strong> {{ user_id }}</p>
                                     <p>
+
+                                        <strong>Assigned to:</strong></strong>
+
+                                        <p id="assignment-{{ user_id }}">
+                                            {{ user.assigned_to }}
+                                            {% if user.assigned_to is not none %}
+                                                -> {{ users_data[user.assigned_to].name }}
+                                            {% endif %}
+                                        </p>  
                                         <strong>Assignment:</strong></strong>
 
                                         <p id="assignment-{{ user_id }}">
