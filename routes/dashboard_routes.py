@@ -19,6 +19,11 @@ def dashboard():
     if user_data is None:
         flash("Nie znaleziono danych użytkownika. Proszę spróbować ponownie.", "error")
         return redirect(url_for("auth.logout"))
+    
+    items = get_all_items()
+    
+    for item in items : 
+        print(items[item])
 
     return render_template("dashboard.html", 
                            user = user_data, 

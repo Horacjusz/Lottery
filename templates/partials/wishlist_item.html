@@ -1,2 +1,2 @@
-<span class="item-name">{{ item.item_name }}</span>
-<span class="item-description">{{ item.item_description | linkify }}</span>
+<span class="item-name" id = "item-{{ item_id }}-name">{{ item.item_name | safe }}</span>
+<span class="item-description" id = "item-{{ item_id }}-description">{{ item.item_description | linkify | safe}}</span>

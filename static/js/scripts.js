@@ -4,7 +4,7 @@ function linkify(text) {
 }
 
 function checkForSymbols(inputString) {
-    const dangerousSymbols = ["'", '"', '<', '>', '&'];
+    const dangerousSymbols = ['"'];
 
     for (const symbol of dangerousSymbols) {
         if (inputString.includes(symbol)) {
@@ -304,26 +304,65 @@ function cleanString(input) {
 
 
 
-function editItem(event, item_id, itemName, itemDescription) {
+function editItem(event, item_id) {
     event.preventDefault();
     event.stopPropagation();
 
-    const row = event.target.closest("tr");
-    const nameCell = row.querySelector(".item-name");
-    const descCell = row.querySelector(".item-description");
-    nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name" required>`;
+    // Znajdź wiersz na podstawie atrybutu data-item-id
+    const row = document.querySelector(`tr[data-item-id="${item_id}"]`);
+    console.log('Row:', row);
+
+    if (!row) {
+        console.error(`Nie znaleziono wiersza dla item_id: ${item_id}`);
+        return;
+    }
+
+    // Pobierz pola nazwy i opisu
+    const nameCell = row.querySelector(`#item-${item_id}-name`);
+    const descCell = row.querySelector(`#item-${item_id}-description`);
+    console.log('NameCell:', nameCell);
+    console.log('DescCell:', descCell);
+
+    if (!nameCell || !descCell) {
+        console.error('Nie znaleziono odpowiednich pól dla nazwy lub opisu.');
+        return;
+    }
+
+    const itemName = nameCell.textContent.trim();
+    const itemDescription = descCell.textContent.trim();
+    console.log('ItemName:', itemName, 'ItemDescription:', itemDescription);
+
+    // Zmień zawartość na pola edycji
+    nameCell.innerHTML = `<input type="text" value="${cleanString(itemName)}" class="edit-name" required>`;
     descCell.innerHTML = `<input type="text" value="${cleanString(itemDescription)}" class="edit-description">`;
 
-
+    // Zmień ikonę edycji na ikonę zapisu
     const editIconCell = row.querySelector(".edit-icon").parentElement;
+    console.log('EditIconCell:', editIconCell);
+
+    if (!editIconCell) {
+        console.error('Nie znaleziono komórki ikony edycji.');
+        return;
+    }
+
     editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, ${item_id})">💾</span>`;
 }
+
+
+
 
 function saveItem(event, item_id) {
     event.preventDefault();
     event.stopPropagation();
 
-    const row = event.target.closest("tr");
+    // Znajdź wiersz elementu w tabeli na podstawie atrybutu data-item-id
+    const row = document.querySelector(`tr[data-item-id="${item_id}"]`);
+
+    if (!row) {
+        console.error(`Nie znaleziono wiersza dla item_id: ${item_id}`);
+        return;
+    }
+
     const nameInput = row.querySelector(".edit-name");
     const descInput = row.querySelector(".edit-description");
 
@@ -474,11 +513,11 @@ function updateWishlist(owner_id, item) {
 
     newRow.innerHTML = `
         <td>
-            <span class="item-name">${item.item_name}</span>
-            <span class="item-description">${linkify(item.item_description)}</span>
+            <span class="item-name" id = "item-${item.item_id}-name">${item.item_name}</span>
+            <span class="item-description" id = "item-${item.item_id}-description">${linkify(item.item_description)}</span>
         </td>
         <td>
-            <span class="edit-icon" onclick="editItem(event, '${item.item_id}', '${item.item_name}', '${item.item_description}')">✎</span>
+            <span class="edit-icon" onclick="editItem(event, ${item.item_id})">✎</span>
         </td>
         <td>
             <span class="remove-icon" onclick="removeItem(event, ${item.item_id})">×</span>

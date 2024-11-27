@@ -105,6 +105,7 @@ def add_item_route():
 
         item = create_item(owner_id, {ITEM_NAME: item_name, ITEM_DESCRIPTION: item_description})
         print("finished creating new item")
+        print(item)
         return jsonify({"success": True, "item": item})
     except Exception as e:
         print(f"Error adding item: {e}")

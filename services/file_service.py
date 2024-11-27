@@ -1,7 +1,6 @@
 from models.models import User, Item, Setting
 from services.database import datasession
 from settings.tokens import *
-import html
 
 
 def get_user_database(user_id) :
@@ -26,9 +25,9 @@ def save_user_data(user_data):
     user = get_user_database(user_data[USER_ID])
     if not user:
         user = User(user_id=user_data[USER_ID])
-    user.name = html.escape(user_data.get("name"))
-    user.username = html.escape(user_data.get("username"))
-    user.password = html.escape(user_data.get("password"))
+    user.name = user_data.get("name")
+    user.username = user_data.get("username")
+    user.password = user_data.get("password")
     user.visible = user_data.get("visible", True)
     user.choosable = user_data.get("choosable", True)
     user.spouse = user_data.get("spouse")
@@ -147,8 +146,8 @@ def save_item_data(item_data):
     item = get_item_database(item_data[ITEM_ID])
     if not item:
         item = Item(item_id=item_data[ITEM_ID])
-    item.item_name = html.escape(item_data.get("item_name"))
-    item.item_description = html.escape(item_data.get("item_description", "ㅤ"))
+    item.item_name = item_data.get("item_name")
+    item.item_description = item_data.get("item_description", "ㅤ")
     item.reserved_by = item_data.get("reserved_by")
     item.owner_id = item_data.get("owner_id")
     item.bought = item_data.get("bought", False)
