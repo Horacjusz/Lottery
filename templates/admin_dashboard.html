@@ -45,8 +45,8 @@
                                 <div class="user-header">
                                     <span class="user-text">
                                         <strong>
-                                        {{ user.name }} 
-                                        ({{ user.username }})
+                                        {{ user.name }}<br>
+                                        ({{ user.username }})<br>
                                         {% if user.choosable %}
                                             Assigned ->
                                             {% if user.assigned_to is not none %}
@@ -54,12 +54,14 @@
                                             {% else %}
                                                 👎
                                             {% endif %}
+                                            <br>
                                             Assigment ->
                                             {% if user.assignment is not none %}
                                                 👍
                                             {% else %}
                                                 👎
                                             {% endif %}
+                                            <br>
                                         {% endif %}
                                         </strong>
                                     </span>
