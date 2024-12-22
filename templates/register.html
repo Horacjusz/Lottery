@@ -18,6 +18,12 @@
                 {% set user_spouse = none %}
                 {% include 'partials/basic_user_changes.html' %}
 
+                <p>
+                    <label for="confirm_password-{{ user_id }}"><strong>Potwierdź hasło</strong>{% if edit_mode %} (może pozostać puste){% endif %}:</label>
+                    <input type="password" id="confirm_password-{{ user_id }}" name="password" value = "{{ user.password | default('') }}" {% if admin %}disabled{% endif %}>
+                </p>
+
+
                 <button type="submit">{{ 'Zapisz zmiany' if edit_mode else 'Zarejestruj' }}</button>
             </form>
             

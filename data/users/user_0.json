@@ -1,0 +1,14 @@
+{
+    "user_ID": 0,
+    "admin": true,
+    "visible": false,
+    "username": "master",
+    "password": "master_password",
+    "name": "Admin",
+    "choosable": false,
+    "spouse": null,
+    "assignment": null,
+    "assigned_to": null,
+    "wishlist": [],
+    "reserved_items": []
+}

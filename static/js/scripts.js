@@ -1,21 +1,4 @@
-function linkify(text) {
-    const urlPattern = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlPattern, '<a href="$1" target="_blank">$1</a>');
-}
-
-function checkForSymbols(inputString) {
-    const dangerousSymbols = ['"'];
-
-    for (const symbol of dangerousSymbols) {
-        if (inputString.includes(symbol)) {
-            alert(`Niedozwolony symbol ${symbol} w napisie ${inputString}`);
-            return false;
-        }
-    }
-    return true;
-
-}
-
+// Function to submit draw form
 function submitDrawForm(user_id) {
     const form = document.getElementById(`draw-form-${user_id}`);
     const url = form.action;
@@ -33,14 +16,15 @@ function submitDrawForm(user_id) {
         return response.json();
     })
     .then(data => {
+        console.log("Server response:", data);
+
         if (data.success) {
             const assignmentElement = document.getElementById(`assignment-${user_id}`);
             if (data.assignment) {
                 assignmentElement.innerHTML = `${data.assignment_name || "Unknown Name"} -> Odśwież, aby zobaczyć listę prezentową`;
             } else {
-                assignmentElement.textContent = "Nie udało się nikogo znaleźć :c";
+                assignmentElement.textContent = "No assignment available.";
             }
-            location.reload();
         } else {
             alert("Failed to process the draw request.");
         }
@@ -51,30 +35,8 @@ function submitDrawForm(user_id) {
     });
 }
 
-
-
-function resetLottery() {
-    
-    fetch(`/admin/reset_lottery`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not OK");
-        }
-        return response.json();
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        alert("An error occurred while processing the draw request.");
-    });
-}
-
-
 function toggleLotteryActive(event) {
+    console.log("Toggling lottery");
 
     event.preventDefault();
 
@@ -154,18 +116,21 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                const wishlistRow = document.querySelector(`#wishlist-${data.owner_id} tr[data-item-id="${item_id}"]`);
+                // Correctly remove the item from the wishlist
+                const wishlistRow = document.querySelector(`#wishlist- tr[data-item-id="${item_id}"]`);
+                console.log(wishlistRow);
                 if (wishlistRow) {
                     wishlistRow.remove();
                 }
 
+                // Add the item to the reserved table if on_dashboard is true
                 if (on_dashboard) {
                     const reservedTableBody = document.querySelector(`#reserved-table-${user_id} tbody`);
                     const reservedRow = `
                         <tr class="reserved-item" data-item-id="${item_id}">
                             <td>
                                 <span class="item-name">${data.item.item_name}</span>
-                                <span class="item-description">${linkify(data.item.item_description)}</span>
+                                <span class="item-description">${data.item.item_description}</span>
                             </td>
                             <td>
                                 <span class="remove-icon" onclick="unreserveItem(event, '${item_id}')">×</span>
@@ -175,10 +140,9 @@ function reserveItem(event, user_id, item_id, on_dashboard) {
                             </td>
                         </tr>
                     `;
-                    console.log("user_id")
                     reservedTableBody.insertAdjacentHTML("beforeend", reservedRow);
 
-                    console.log("user_id")
+                    // Hide "no reserved items" message if there are items now
                     const noReservedItemsMessage = document.getElementById("no-reserved-items");
                     if (noReservedItemsMessage) {
                         noReservedItemsMessage.style.display = "none";
@@ -215,11 +179,13 @@ function unreserveItem(event, item_id, on_dashboard) {
             if (data.success) {
                 const { user_id, item } = data;
 
+                // Remove the item from the reserved table
                 const reservedRow = document.querySelector(`#reserved-table-${user_id} tr[data-item-id="${item_id}"]`);
                 if (reservedRow) {
                     reservedRow.remove();
                 }
 
+                // Show "no reserved items" message if the reserved table is empty
                 const reservedTableBody = document.querySelector(`#reserved-table-${user_id} tbody`);
                 const noReservedItemsMessage = document.getElementById("no-reserved-items");
                 if (!reservedTableBody || !reservedTableBody.querySelector("tr")) {
@@ -228,7 +194,7 @@ function unreserveItem(event, item_id, on_dashboard) {
                     noReservedItemsMessage.style.display = "none";
                 }
             } else {
-                alert(data.message || "Nie można usunąć przedmiotu z listy zarezerwowanych. Może jest oznaczony jako kupiony?");
+                alert(data.error || "Error unreserving item.");
             }
         })
         .catch((error) => {
@@ -240,7 +206,8 @@ function unreserveItem(event, item_id, on_dashboard) {
 
 
 
-function toggleBought(event, item_id, user_id) {
+
+function toggleBought(event, item_id) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -250,29 +217,20 @@ function toggleBought(event, item_id, user_id) {
             "Content-Type": "application/json",
         },
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
+        .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                const reservedTable = document.querySelector(`#reserved-table-${user_id}`);
                 const reservedRow = document.querySelector(`tr[data-item-id="${item_id}"]`);
-
-                if (reservedRow && reservedTable) {
+                if (reservedRow) {
+                    // Toggle the green background based on the new bought status
                     if (data.bought) {
                         reservedRow.classList.add("reserved-green");
-                        reservedTable.appendChild(reservedRow);
                     } else {
                         reservedRow.classList.remove("reserved-green");
-                        reservedTable.prepend(reservedRow);
                     }
-                } else {
-                    console.error("Reserved table or row not found.");
                 }
 
+                // Update the cell style for the reserved status
                 const reservedCell = document.querySelector(`#reserved-table-${item_id}-accept`);
                 if (reservedCell) {
                     if (data.bought) {
@@ -282,105 +240,44 @@ function toggleBought(event, item_id, user_id) {
                         reservedCell.classList.remove("edit-icon");
                         reservedCell.classList.add("remove-icon");
                     }
-                } else {
-                    console.error("Reserved cell not found.");
                 }
             } else {
                 alert(data.error || "Error toggling bought status.");
             }
         })
         .catch((error) => {
-            console.error("Error occurred:", error.message || error);
+            console.error("Error:", error);
             alert("An error occurred while processing the request.");
         });
 }
 
-function cleanString(input) {
-    if (input.length === 1 && input === 'ㅤ') {
-        console.log("just filler")
-        return '';
-    }
-    return input;
-}
 
-
-
-
-function editItem(event, item_id) {
+function editItem(event, item_id, itemName, itemDescription) {
+    console.log("Editing item:", item_id);
     event.preventDefault();
     event.stopPropagation();
 
-    // Znajdź wiersz na podstawie atrybutu data-item-id
-    const row = document.querySelector(`tr[data-item-id="${item_id}"]`);
-    console.log('Row:', row);
+    const row = event.target.closest("tr");
+    const nameCell = row.querySelector(".item-name");
+    const descCell = row.querySelector(".item-description");
 
-    if (!row) {
-        console.error(`Nie znaleziono wiersza dla item_id: ${item_id}`);
-        return;
-    }
+    // Replace text with input fields for editing
+    nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name">`;
+    descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
 
-    // Pobierz pola nazwy i opisu
-    const nameCell = row.querySelector(`#item-${item_id}-name`);
-    const descCell = row.querySelector(`#item-${item_id}-description`);
-    console.log('NameCell:', nameCell);
-    console.log('DescCell:', descCell);
-
-    if (!nameCell || !descCell) {
-        console.error('Nie znaleziono odpowiednich pól dla nazwy lub opisu.');
-        return;
-    }
-
-    const itemName = nameCell.textContent.trim();
-    const itemDescription = descCell.textContent.trim();
-    console.log('ItemName:', itemName, 'ItemDescription:', itemDescription);
-
-    // Zmień zawartość na pola edycji
-    nameCell.innerHTML = `<input type="text" value="${cleanString(itemName)}" class="edit-name" required>`;
-    descCell.innerHTML = `<input type="text" value="${cleanString(itemDescription)}" class="edit-description">`;
-
-    // Zmień ikonę edycji na ikonę zapisu
+    // Change edit icon to save icon
     const editIconCell = row.querySelector(".edit-icon").parentElement;
-    console.log('EditIconCell:', editIconCell);
-
-    if (!editIconCell) {
-        console.error('Nie znaleziono komórki ikony edycji.');
-        return;
-    }
-
     editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, ${item_id})">💾</span>`;
 }
 
-
-
-
 function saveItem(event, item_id) {
+    console.log("Saving item:", item_id);
     event.preventDefault();
     event.stopPropagation();
 
-    // Znajdź wiersz elementu w tabeli na podstawie atrybutu data-item-id
-    const row = document.querySelector(`tr[data-item-id="${item_id}"]`);
-
-    if (!row) {
-        console.error(`Nie znaleziono wiersza dla item_id: ${item_id}`);
-        return;
-    }
-
-    const nameInput = row.querySelector(".edit-name");
-    const descInput = row.querySelector(".edit-description");
-
-    const newName = nameInput.value.trim();
-    var newDescription = descInput.value.trim();
-    
-    if (!checkForSymbols(newName)) {return;}
-    if (!checkForSymbols(newDescription)) {return;}
-
-    if (!newDescription) {
-        newDescription = "ㅤ";
-    }
-    if (!newName) {
-        alert("Nazwa przedmiotu nie może być pusta.");
-        return;
-    }
+    const row = event.target.closest("tr");
+    const newName = row.querySelector(".edit-name").value;
+    const newDescription = row.querySelector(".edit-description").value;
 
     fetch(`/items/edit/${item_id}`, {
         method: "POST",
@@ -395,19 +292,22 @@ function saveItem(event, item_id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            console.log("Item saved successfully:", data);
 
+            // Update the row with the new data
             row.querySelector(".item-name").innerText = newName;
             row.querySelector(".item-description").innerText = newDescription;
 
+            // Change save icon back to edit icon
             const saveIconCell = row.querySelector(".save-icon").parentElement;
             saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, ${item_id}, '${newName}', '${newDescription}')">✎</span>`;
         } else {
-            alert(data.error || "Błąd podczas zapisywania - pamiętaj, że przedmiot musi mieć nazwę i opis");
+            alert(data.error || "Error saving changes.");
         }
     })
     .catch(error => {
         console.error("Error:", error);
-        alert("Błąd podczas zapisywania przedmiotu");
+        alert("An error occurred while saving the item.");
     });
 }
 
@@ -447,27 +347,19 @@ function removeItem(event, item_id) {
 }
 
 
-function addItem(event, owner_id) {
-    event.preventDefault()
+function addItem(owner_id) {
     const itemInput = document.getElementById(`wishlist_item-${owner_id}`);
-    var descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
+    const descriptionInput = document.getElementById(`wishlist_description-${owner_id}`);
 
     // Check if elements exist
-    if (!itemInput) {
+    if (!itemInput || !descriptionInput) {
         alert("Error: Missing input fields for adding items.");
         console.error(`Input fields not found for user ID: ${owner_id}`);
         return;
     }
 
-    if (!descriptionInput) {
-        descriptionInput = " ";
-    }
-
     const itemName = itemInput.value.trim();
     const itemDescription = descriptionInput.value.trim();
-
-    if (!checkForSymbols(itemName)) {return;}
-    if (!checkForSymbols(itemDescription)) {return;}
 
     if (!itemName) {
         alert("Nazwa przedmiotu jest wymagana.");
@@ -488,8 +380,8 @@ function addItem(event, owner_id) {
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
-                updateWishlist(owner_id, data.item);
-                itemInput.value = "";
+                updateWishlist(owner_id, data.item); // Update wishlist with the new item
+                itemInput.value = ""; // Clear the input fields
                 descriptionInput.value = "";
             } else {
                 alert(data.error || "Nie udało się dodać przedmiotu.");
@@ -504,31 +396,23 @@ function addItem(event, owner_id) {
 
 function updateWishlist(owner_id, item) {
     const wishlistTable = document.getElementById(`own-wishlist-table-${owner_id}`);
-    if (!wishlistTable) {
-        console.error("Wishlist table not found for owner ID:", owner_id);
-        return;
-    }
-
     const newRow = document.createElement("tr");
     newRow.setAttribute("data-item-id", item.item_id);
 
-
     newRow.innerHTML = `
         <td>
-            <span class="item-name" id = "item-${item.item_id}-name">${item.item_name}</span>
-            <span class="item-description" id = "item-${item.item_id}-description">${linkify(item.item_description)}</span>
+            <span class="item-name">${item.item_name}</span>
+            <span class="item-description">${item.item_description}</span>
         </td>
         <td>
-            <span class="edit-icon" onclick="editItem(event, ${item.item_id})">✎</span>
+            <span class="edit-icon" onclick="editItem(event, '${item.item_id}', '${item.item_name}', '${item.item_description}')">✎</span>
         </td>
         <td>
             <span class="remove-icon" onclick="removeItem(event, ${item.item_id})">×</span>
         </td>
     `;
-
     wishlistTable.querySelector("tbody").appendChild(newRow);
 }
-
 
 
 function validatePasswords() {
@@ -556,8 +440,8 @@ function updateUser(event, user_id = null, edit_mode = true) {
 
     const spouseElement = document.querySelector(`#spouse-${user_id}`);
     const spouse = spouseElement ? spouseElement.value : null;
-
-    console.log(user_id)
+    
+    if (user_id == 'new') {user_id = null;}
 
     // Check if passwords match
     if (password !== confirmPassword) {
@@ -571,7 +455,7 @@ function updateUser(event, user_id = null, edit_mode = true) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: username, user_ID: user_id }),
+        body: JSON.stringify({ username }),
     })
         .then((response) => {
             if (!response.ok) {
@@ -587,18 +471,18 @@ function updateUser(event, user_id = null, edit_mode = true) {
 
             // Continue if username is free
             const payload = {
-                user_id,
-                edit_mode,
-                spouse,
-                name,
-                username,
-                password,
-                choosable,
-                visible,
-                admin
+                user_id: user_id,
+                new_spouse: spouse,
+                new_name: name,
+                new_username: username,
+                new_password: password,
+                new_choosable: choosable,
+                new_visible: visible,
+                new_admin: admin,
             };
-            
-            fetch(`/users/update`, {
+
+            const str = user_id ? `/${user_id}` : "";
+            fetch(`/users/update${str}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -630,28 +514,4 @@ function updateUser(event, user_id = null, edit_mode = true) {
             console.error("Error checking username:", error);
             document.getElementById("error").textContent = "Nazwa użytkownika jest już zajęta.";
         });
-}
-
-
-async function deleteUser(userId) {
-    try {
-        const response = await fetch(`/users/delete_user_route`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: userId }),
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            alert(`User ${userId} has been deleted.`);
-            location.reload(); // Refresh the page on success
-        } else {
-            alert(`Failed to delete user ${userId}: ${result.message}`);
-        }
-    } catch (error) {
-        alert(`Error deleting user ${userId}: ${error.message}`);
-    }
 }

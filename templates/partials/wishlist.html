@@ -1,29 +1,18 @@
-<p><strong>Lista życzeń:</strong></p>
 <table class="wishlist-table" id="wishlist-{{ assignment.user_ID }}">
     <tbody>
-        {% set items_to_display = [] %}
         {% for item_id in assignment.wishlist %}
             {% set item = items_data[item_id] %}
             {% if item.reserved_by is none %}
-                {% set _ = items_to_display.append(item) %}
-            {% endif %}
-        {% endfor %}
-        
-        {% if items_to_display %}
-            {% for item in items_to_display %}
-                <tr data-item-id="{{ item.item_id }}" data-item="{{ item.item_id }}">
+                <tr data-item-id="{{ item_id }}" data-item="{{ item_id }}">
                     <td>
-                        {% include 'partials/wishlist_item.html' %}
+                        <span class="item-name">{{ item.item_name }}</span>
+                        <span class="item-description">{{ item.item_description }}</span>
                     </td>
                     <td>
                         <span class="approve-icon" onclick="reserveItem(event, {{ user_id }}, {{ item.item_id }}, {{ on_dashboard | default('false') | lower }})">✔</span>
                     </td>
                 </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="2" style="text-align: center;">Nic tu jeszcze nie ma</td>
-            </tr>
-        {% endif %}
+            {% endif %}
+        {% endfor %}
     </tbody>
 </table>

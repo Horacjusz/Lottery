@@ -9,7 +9,6 @@
     </head>
     <body>
         <div class="admin-dashboard">
-            {% set on_dashboard = true %}
             <h2>Admin Dashboard</h2>
             <div class="settings">
                 <h3>Settings</h3>
@@ -23,13 +22,6 @@
                     <p id="lottery-status">
                         Current status: {{ 'Enabled' if settings.LOTTERY_ACTIVE else 'Disabled' }}
                     </p>
-                    {% if not settings.LOTTERY_ACTIVE %}
-                        <p>
-                            <button type="button" class="dashboard-link logout" onclick="resetLottery()">
-                                resetLottery
-                            </button>
-                        </p>
-                    {% endif %}
                 </div>
             </div>
             {% set admin = true %}
@@ -43,43 +35,14 @@
                             {% set user = users_data[user_id] %}
                             <li class="user-item">
                                 <div class="user-header">
-                                    <span class="user-text">
-                                        <strong>
-                                        {{ user.name }}<br>
-                                        ({{ user.username }})<br>
-                                        {% if user.choosable %}
-                                            Assigned ->
-                                            {% if user.assigned_to is not none %}
-                                                👍
-                                            {% else %}
-                                                👎
-                                            {% endif %}
-                                            <br>
-                                            Assigment ->
-                                            {% if user.assignment is not none %}
-                                                👍
-                                            {% else %}
-                                                👎
-                                            {% endif %}
-                                            <br>
-                                        {% endif %}
-                                        </strong>
-                                    </span>
+                                    <span class="user-text">{{ user.name }} ({{ user.username }})</span>
                                     <button class="collapsible user-collapsible">+</button>
                                 </div>
                                 <div class="content user-content"><p><strong>ID:</strong> {{ user_id }}</p>
                                     <p>
+                                        <strong>Assignment:</strong></strong>
 
-                                        <strong>Assigned to:</strong>
-
-                                        <p id="assigned-to-{{ user_id }}">
-                                            {{ user.assigned_to }}
-                                            {% if user.assigned_to is not none %}
-                                                -> {{ users_data[user.assigned_to].name }}
-                                            {% endif %}
-                                        </p>  
-                                        <strong>Assignment:</strong>
-
+                                        <!-- Assignment Display -->
                                         <p id="assignment-{{ user_id }}">
                                             {{ user.assignment }}
                                             {% if user.assignment is not none %}
@@ -87,6 +50,7 @@
                                             {% endif %}
                                         </p>      
 
+                                        <!-- Draw Form -->
                                         {% include 'partials/draw_button.html' %}
 
                                     </p>
@@ -128,28 +92,12 @@
                                         {% set reserved_items = user.reserved_items %}
                                         {% include 'partials/reserved_items.html' %}
                                     </p>
-                                    <p>
-                                        {% if user_id != admin_id %}
-                                            <button type="button" class="dashboard-link logout" onclick="deleteUser({{ user_id }})">
-                                                Delete User
-                                            </button>
-                                        {% else %}
-                                            <button type="button" class="dashboard-link logout">
-                                                Nie możesz usunąć samego siebie
-                                            </button>
-                                        {% endif %}
-                                    </p>
                                 </div>
                             </li>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
-
-
-
-
-
 
             <div class="section">
                 <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Log out</a>

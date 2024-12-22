@@ -1,24 +1,20 @@
 <table class="wishlist-table" id="reserved-table-{{ user_id }}">
     <tbody>
-        {% set just_reserved = [] %}
-        {% set reserved_and_bought = [] %}
         {% for item_id in reserved_items %}
             {% set item = items_data[item_id] %}
-            {% if item.bought %}
-                {% set _ = reserved_and_bought.append(item_id) %}
-            {% else %}
-                {% set _ = just_reserved.append(item_id) %}
-            {% endif %}
-        {% endfor %}
-
-
-        {% for item_id in just_reserved %}
-            {% set item = items_data[item_id] %}
-            {% include 'partials/reserved_list_item.html' %}
-        {% endfor %}
-        {% for item_id in reserved_and_bought %}
-            {% set item = items_data[item_id] %}
-            {% include 'partials/reserved_list_item.html' %}
+            <tr class="reserved-item {% if item.bought %}reserved-green{% endif %}" data-item-id="{{ item_id }}">
+                <td>
+                    <span class="item-name">{{ item.item_name }}</span>
+                    <span class="item-description">{{ item.item_description }}</span>
+                    <span class="item-owner">{{ item.owner_name }}</span>
+                </td>
+                <td>
+                    <span id = 'reserved-table-{{ item_id }}-accept' class="{% if item.bought %}edit-icon{% else %}remove-icon{% endif %}" onclick="unreserveItem(event, '{{ item_id }}')">×</span>
+                </td>
+                <td>
+                    <span class="edit-icon" onclick="toggleBought(event, '{{ item_id }}')">💲</span>
+                </td>
+            </tr>
         {% endfor %}
     </tbody>
 </table>

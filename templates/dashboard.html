@@ -1,112 +1,416 @@
 <!DOCTYPE html>
 <html lang="pl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Panel użytkownika</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-        <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
-    </head>
-    <body>
-        <div class="dashboard-container">
-            {% set admin = false %}
-            {% set on_dashboard = true %}
-            {% set user_id = user.user_ID %}
-            <h2>Witaj, {{ user.name }}!</h2>
-            <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.<br>Jeśli chcesz skontaktować się z administratorem jest nim Paweł</p>
-            <p>
-                <strong>Legenda:<br></strong>
-                <strong>💲</strong> - oznacz / odznacz przedmiot jako kupiony<br>
-                <strong>×</strong> - usuń / zrezygnuj z rezerwacji<br>
-                <strong>✔</strong> - zarezerwuj przedmiot<br>
-                <strong>✎</strong> - edytuj przedmiot<br>
-                <strong>💾</strong> - zapisz przedmiot<br>
-            </p>
-            
-            {% if user.choosable %}
-            <div class="section">
-                <h3>Losowanie</h3>
-                    {% if user.assignment is none %}
-                        <p id="assignment-{{ user_id }}">
-                            Musisz kogoś wylosować
-                        </p>
-                    {% else %}
-                        {% set assignment = users_data[user.assignment] %}
-                        
-                        <div class="assigned-user-info">
-                            <p>
-                                <strong>Wylosowano:</strong>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel użytkownika</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        {% set admin = false %}
+        {% set on_dashboard = true %}
+        {% set user_id = user.user_ID %}
+        <h2>Witaj, {{ user.name }}!</h2>
+        <p>Witamy w Twoim panelu użytkownika. Tutaj możesz zarządzać swoim kontem, zobaczyć listę życzeń oraz rozpocząć losowanie.</p>
 
-                                <p id="assignment-{{ user_id }}", class = "user-name">
-                                    {{ assignment.name }}
-                                </p>
-                            </p>
-                            {% include 'partials/wishlist.html' %}
-                        </div>
-                    {% endif %}
-                {% include 'partials/draw_button.html' %}
-            </div>
-            {% endif %}
-            
-            <div class="section">
-                <h3>Twoje zarezerwowane przedmioty:</h3>
-                <p>
-                    {% set reserved_items = user.reserved_items %}
-                    {% include 'partials/reserved_items.html' %}
+        <div class="section">
+            <h3>Losowanie</h3>
+            {% if user.assignment is none %}
+                <p id="assignment-{{ user_id }}">
+                    Musisz kogoś wylosować
                 </p>
-            </div>
-
-
-            <div class="section">
-                <a href="{{ url_for('user.user_list') }}" class="dashboard-link">Lista Użytkowników</a>
-            </div>
-
-            <div class="section">
-                <h3>Twoja lista życzeń:</h3>
-                {% set wishlist = user.wishlist %}
-                <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
+            {% else %}
+                {% set assignment = users_data[user.assignment] %}
                 
-                {% include 'partials/own_wishlist.html' %}
-            </div>
+                <!-- If an assignment exists, display the assigned user's information in a two-column table -->
+                <div class="assigned-user-info">
+                    <p>
+                        <strong>Wylosowano:</strong>
 
-            <div class="section">
-                <h3>Małżonek</h3>
-                    {% if user.spouse is none %}
+                        <!-- Assignment Display -->
                         <p id="assignment-{{ user_id }}">
-                            <strong>Nie posiadasz małżonka</strong><br>Jeśli chcesz, żeby ktoś się tu pojawił, poczekaj aż stworzy konto lub poszukaj go na stronie edycji danych
+                            {{ assignment.name }}
                         </p>
-                    {% else %}
-                        {% set assignment = users_data[user.spouse] %}
-                        
-                        <div class="assigned-user-info">
-                            <p>
-                                <strong>Twoim małżonkiem jest:</strong>
-
-                                <p id="assignment-{{ user_id }}", class = "user-name">
-                                    {{ assignment.name }}
-                                </p>
-                            </p>
-                            {% include 'partials/wishlist.html' %}
-                        </div>
-                    {% endif %}
-            </div>
-
-            <div class="section">
-                <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
-            </div>
-
-            <div class="section">
-                <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Wyloguj się</a>
-            </div>
-
-            <p>Jeśli chcesz z jakiegoś powodu usunąć swoje konto skontaktuj się z administratorem</p>
-
-            {% if user.admin %}
-                <div class="section">
-                    <a href="{{ url_for('admin.admin_dashboard') }}" class="dashboard-link">Panel Administratora</a>
+                    </p>
+                    {% include 'partials/wishlist.html' %}
                 </div>
             {% endif %}
+            {% include 'partials/draw_button.html' %}
+        </div>
+        
+        <div class="section">
+            <h3>Twoje zarezerwowane przedmioty:</h3>
+            <p>
+                {% set reserved_items = user.reserved_items %}
+                {% include 'partials/reserved_items.html' %}
+            </p>
         </div>
 
-    </body>
+
+        <div class="section">
+            <a href="{{ url_for('user.user_list') }}" class="dashboard-link">Lista Użytkowników</a>
+        </div>
+
+        <div class="section">
+            <h3>Twoja lista życzeń:</h3>
+            {% set wishlist = user.wishlist %}
+            <p id="no-items" {% if wishlist and wishlist|length > 0 %}style="display: none;"{% endif %}>Nic tu jeszcze nie ma</p>
+            
+            {% include 'partials/own_wishlist.html' %}
+
+
+        </div>
+
+
+
+        <div class="section">
+            <a href="{{ url_for('auth.verify_password') }}" class="dashboard-link">Edytuj dane użytkownika</a>
+        </div>
+
+        <div class="section">
+            <a href="{{ url_for('auth.logout') }}" class="dashboard-link logout">Wyloguj się</a>
+        </div>
+    </div>
+
+    <script>
+        {# function checkUnreservedItems() {
+            const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
+            const emptyMessage = document.querySelector(".assigned-user-info p.empty-message");
+
+            // Check if the wishlist table exists before proceeding
+            if (!wishlistTableBody) return;
+
+            if (wishlistTableBody.children.length === 0) {
+                if (!emptyMessage) {
+                    const message = document.createElement("p");
+                    message.classList.add("empty-message");
+                    message.innerText = "Nic tu nie ma ¯\\_(ツ)_/¯";
+                    document.querySelector(".assigned-user-info").appendChild(message);
+                }
+            } else if (emptyMessage) {
+                emptyMessage.remove();
+            }
+        }
+
+    
+        function acceptItem(event, username, name, itemName, itemDescription) {
+            const iconElement = event.target;
+            const row = iconElement.closest("tr");
+            const reservedTableBody = document.querySelector("#reserved-table tbody");
+    
+            // Instantly remove the item row from the assigned user's wishlist table
+            row.remove();
+            checkUnreservedItems(); // Check if "Empty" message should be displayed
+    
+            // Hide "No reserved items" message if it is currently displayed
+            const noReservedItemsMessage = document.getElementById("no-reserved-items");
+            if (noReservedItemsMessage) {
+                noReservedItemsMessage.style.display = "none";
+            }
+    
+            // Add the item to the reserved items section with the display name (name) instead of username
+            const newRow = document.createElement("tr");
+            newRow.classList.add("reserved-item");
+            newRow.setAttribute("data-item", `${itemName} - ${itemDescription}`);
+    
+            newRow.innerHTML = `
+                <td>
+                    <span class="item-name">${itemName}</span>
+                    <span class="item-description">${itemDescription}</span>
+                    <span class="item-owner">${name}</span> <!-- Use display name -->
+                </td>
+                <td><span class="remove-icon" onclick="unreserveItem(event, '${itemName}', '${itemDescription}', '${username}', '${name}')">×</span></td>
+            `;
+            reservedTableBody.appendChild(newRow);
+    
+            // Send request to reserve item on the server
+            fetch("{{ url_for('user.reserve_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: username,
+                    item_name: itemName,
+                    item_description: itemDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.error || "Error reserving item.");
+                    const wishlistTable = document.querySelector("#assigned-user-wishlist tbody");
+                    wishlistTable.appendChild(row); // Add back the row if there was an error
+                    checkUnreservedItems(); // Recheck "Empty" message
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error processing reservation request.");
+                const wishlistTable = document.querySelector("#assigned-user-wishlist tbody");
+                wishlistTable.appendChild(row); // Re-add the row in case of error
+                checkUnreservedItems(); // Recheck "Empty" message
+            });
+        }
+    
+        function unreserveItem(event, itemName, itemDescription, ownerUserName, ownerName) {
+            const reservedRow = event.target.closest("tr");
+            const wishlistTableBody = document.querySelector("#assigned-user-wishlist tbody");
+            const noReservedItemsMessage = document.getElementById("no-reserved-items");
+
+            // Instantly remove the item from the reserved items table
+            reservedRow.remove();
+
+            // If no reserved items remain, show the "No reserved items" message
+            if (!document.querySelector("#reserved-table tbody tr")) {
+                noReservedItemsMessage.style.display = "block";
+            }
+
+            // Add the item back to the assigned user's wishlist if the table exists
+            if (wishlistTableBody) {
+                const newWishlistRow = document.createElement("tr");
+                newWishlistRow.setAttribute("data-item", `${itemName} - ${itemDescription}`);
+
+                newWishlistRow.innerHTML = `
+                    <td>
+                        <span class="item-name">${itemName}</span>
+                        <span class="item-description">${itemDescription}</span>
+                    </td>
+                    <td>
+                        <span class="approve-icon" onclick="acceptItem(event, '${ownerUserName}', '${ownerName}', '${itemName}', '${itemDescription}')">✔</span>
+                    </td>
+                `;
+                wishlistTableBody.prepend(newWishlistRow);
+            }
+
+            checkUnreservedItems(); // Check if "Empty" message should be displayed
+
+            // Send request to unreserve the item on the server
+            fetch("{{ url_for('user.reserve_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: ownerUserName,
+                    item_name: itemName,
+                    item_description: itemDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.error || "Error unreserving item.");
+                    document.querySelector("#reserved-table tbody").appendChild(reservedRow); // Re-add item in case of error
+                    if (noReservedItemsMessage) {
+                        noReservedItemsMessage.style.display = "none"; // Hide "No reserved items" message again
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error processing unreserve request.");
+                document.querySelector("#reserved-table tbody").appendChild(reservedRow); // Re-add item in case of error
+                if (noReservedItemsMessage) {
+                    noReservedItemsMessage.style.display = "none";
+                }
+            });
+        }
+
+
+    
+        // Run checkUnreservedItems on page load to set the initial state of "Empty" message
+        document.addEventListener("DOMContentLoaded", checkUnreservedItems);
+
+
+
+    
+        function startDraw() {
+            fetch("{{ url_for('draw.start_draw') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const drawResultDiv = document.getElementById("draw-result");
+                if (data.success) {
+                    drawResultDiv.innerHTML = `
+                        <p>Wylosowałeś: <strong>${data.name}</strong></p>
+                        <h4>Lista życzeń:</h4>
+                        <table class="wishlist-table">
+                            <tbody>
+                                ${data.wishlist.map(item => `
+                                    <tr>
+                                        <td>
+                                            <span class="item-name">${item.name}</span> - 
+                                            <span class="item-description">${item.description}</span>
+                                        </td>
+                                        <td>
+                                            <span class="approve-icon" data-username="${data.name}" 
+                                                data-item-name="${item.name}" 
+                                                data-item-description="${item.description}">✔</span>
+                                        </td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    `;
+
+                    // Hide draw button after successful draw
+                    document.getElementById("draw-button").style.display = "none";
+
+                    // Attach event listeners to each approve-icon
+                    document.querySelectorAll(".approve-icon").forEach(icon => {
+                        icon.addEventListener("click", function(event) {
+                            const username = data.username
+                            const name = data.name
+                            const itemName = this.getAttribute("data-item-name");
+                            const itemDescription = this.getAttribute("data-item-description");
+                            acceptItem(event, username, name, itemName, itemDescription);
+                        });
+                    });
+                } else {
+                    drawResultDiv.innerHTML = `<p>${data.error || "Wystąpił błąd podczas losowania."}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("draw-result").innerHTML = "<p>Wystąpił błąd podczas losowania.</p>";
+            });
+        }
+
+
+        
+    
+
+        function editItem(event, itemName, itemDescription) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const row = event.target.closest("tr");
+            const nameCell = row.querySelector(".item-name");
+            const descCell = row.querySelector(".item-description");
+
+            nameCell.innerHTML = `<input type="text" value="${itemName}" class="edit-name">`;
+            descCell.innerHTML = `<input type="text" value="${itemDescription}" class="edit-description">`;
+
+            const editIconCell = row.querySelector(".edit-icon").parentElement;
+            editIconCell.innerHTML = `<span class="save-icon" onclick="saveItem(event, '${itemName}', '${itemDescription}')">💾</span>`;
+        }
+
+        function saveItem(event, originalName, originalDescription) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const row = event.target.closest("tr");
+            const newName = row.querySelector(".edit-name").value;
+            const newDescription = row.querySelector(".edit-description").value;
+
+            fetch("{{ url_for('user.edit_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    original_name: originalName,
+                    original_description: originalDescription,
+                    new_name: newName,
+                    new_description: newDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.querySelector(".item-name").innerText = newName;
+                    row.querySelector(".item-description").innerText = newDescription;
+
+                    const saveIconCell = row.querySelector(".save-icon").parentElement;
+                    saveIconCell.innerHTML = `<span class="edit-icon" onclick="editItem(event, '${newName}', '${newDescription}')">✎</span>`;
+                } else {
+                    alert(data.error || "Error saving changes.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function removeItem(event, itemName, itemDescription) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            fetch("{{ url_for('user.remove_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ wishlist_item: itemName, wishlist_description: itemDescription })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-item="${itemName} - ${itemDescription}"]`);
+                    if (row) {
+                        row.remove();
+                    }
+                    
+                    // Check if the wishlist is now empty
+                    const tableBody = document.querySelector(".wishlist-table tbody");
+                    if (tableBody.children.length === 0) {
+                        document.getElementById("no-items").style.display = "block";
+                    }
+                } else {
+                    alert(data.error || "Error removing item.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Update to hide the "No items" message on adding an item
+        document.getElementById("wishlist-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const wishlistItem = document.getElementById("wishlist_item").value;
+            const wishlistDescription = document.getElementById("wishlist_description").value;
+
+            fetch("{{ url_for('user.add_wishlist_item') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    wishlist_item: wishlistItem,
+                    wishlist_description: wishlistDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tableBody = document.getElementById("wishlist-table");
+                    const newRow = document.createElement("tr");
+                    newRow.setAttribute("data-item", `${data.item} - ${data.description}`);
+
+                    newRow.innerHTML = `
+                        <td>
+                            <span class="item-name">${data.item}</span>
+                            <span class="item-description">${data.description}</span>
+                        </td>
+                        <td><span class="edit-icon" onclick="editItem(event, '${data.item}', '${data.description}')">✎</span></td>
+                        <td><span class="remove-icon" onclick="removeItem(event, '${data.item}', '${data.description}')">×</span></td>
+                    `;
+
+                    tableBody.appendChild(newRow);
+
+                    document.getElementById("wishlist_item").value = "";
+                    document.getElementById("wishlist_description").value = "";
+                    document.getElementById("no-items").style.display = "none";  // Hide "No items" message
+                } else {
+                    alert(data.error || "Error adding item to wishlist.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }); #}
+    </script>
+</body>
 </html>

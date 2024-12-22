@@ -1,19 +1,26 @@
+from settings.settings import USERS_PATH
 from services.retrieval import get_all_ids
-from services.file_service import load_user_data
+from services.file_service import load_user_file
 from services.permutation_service import kth_permutation_fast, random_permutation
+from services.user_functions.user_service import assign, unassign, edit_user
 from math import factorial
 from settings.tokens import *
 
 def get_all_ch(oosers = True) :
     ids = get_all_ids(USERS)
+    # print(ids)
     ch = []
+    # if oosers : print("choosers")
     for ID in ids :
-        user = load_user_data(ID)
+        user = load_user_file(ID)
         if user[CHOOSABLE] and user[VISIBLE] :
             check_val = user[ASSIGNED_TO]
             if oosers :
                 check_val = user[ASSIGNMENT]
+                # print("choosers")
+            # print(user[USER_ID], "assignment",user[ASSIGNMENT], "assigned_to", user[ASSIGNED_TO])
             if check_val is None :
+                # print("added")
                 ch.append(user[USER_ID])
     return ch
 
@@ -24,8 +31,8 @@ def get_all_choosable() :
     return get_all_ch(oosers = False)
 
 def can_be_assigned(user_id, assignment_id) :
-    user_spouse = load_user_data(user_id)[SPOUSE]
-    assignment_spouse = load_user_data(assignment_id)[SPOUSE]
+    user_spouse = load_user_file(user_id)[SPOUSE]
+    assignment_spouse = load_user_file(assignment_id)[SPOUSE]
     
     identity_fail = user_id == assignment_id
     spouse_fail = user_id == assignment_spouse or user_spouse == assignment_id

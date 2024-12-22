@@ -4,11 +4,12 @@
             {% set item = items_data[item_id] %}
             <tr data-item-id="{{ item_id }}">
                 <td>
-                    {% include 'partials/wishlist_item.html' %}
+                    <span class="item-name">{{ item.item_name }}</span>
+                    <span class="item-description">{{ item.item_description }}</span>
                 </td>
                 <td>
                     <span class="edit-icon" 
-                          onclick="editItem(event, {{ item_id }})">✎</span>
+                          onclick="editItem(event, '{{ item_id }}', '{{ item.item_name|escape }}', '{{ item.item_description|escape }}')">✎</span>
                 </td>
                 <td>
                     <span class="remove-icon" 
@@ -19,9 +20,9 @@
     </tbody>
 </table>
 
-<form id="wishlist-form-{{ user.user_ID }}" onsubmit="addItem(event, {{ user.user_ID }})">
+<form id="wishlist-form-{{ user.user_ID }}">
     <h4>Dodaj przedmiot</h4>
     <input type="text" id="wishlist_item-{{ user.user_ID }}" name="wishlist_item" placeholder="Nazwa przedmiotu" required>
     <input type="text" id="wishlist_description-{{ user.user_ID }}" name="wishlist_description" placeholder="Opis przedmiotu">
-    <button type="submit">Dodaj przedmiot</button>
+    <button type="button" onclick="addItem({{ user.user_ID }})">Dodaj przedmiot</button>
 </form>

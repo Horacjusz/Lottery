@@ -1,10 +1,7 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for, flash, jsonify, request
 from services.verification import is_visible
-from services.file_service import load_settings, save_settings
-from services.lists_service import get_all_users, get_all_items
-from services.draw_service import reset_draw
-from sqlalchemy import text
-from services.database import datasession
+from settings.settings import load_settings, save_settings
+from services.lists_service import get_available_spouses, get_all_users, get_all_items
 from settings.tokens import *
 
 admin_blueprint = Blueprint("admin", __name__, template_folder="templates")
@@ -17,32 +14,22 @@ def admin_dashboard():
     if USERNAME in session and session.get(ADMIN):
         user_id = session[USER_ID]
         visible = is_visible(user_id)
+        # users = get_all_users()  # Assuming this function returns a list of user objects
         users_data = get_all_users()
         items_data = get_all_items()
-        return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), users_data = users_data, items_data = items_data, error_message = "", admin_id = user_id)
+        return render_template("admin_dashboard.html", is_visible=visible, settings = load_settings(), users_data = users_data, items_data = items_data, error_message = "")
     else:
         flash("Brak dostępu: musisz być administratorem.", "error")
         return redirect(url_for("auth.login"))
+    
 
 @admin_blueprint.route("/toggle_lottery", methods=["POST"])
 def toggle_lottery():
-    settings = load_settings()
-    settings["LOTTERY_ACTIVE"] = not settings["LOTTERY_ACTIVE"]
-    save_settings(settings)
+    """Toggle the LOTTERY_ACTIVE setting."""
+    print("Toggling lottery...")
+
+    settings = load_settings()  # Load current settings
+    settings["LOTTERY_ACTIVE"] = not settings["LOTTERY_ACTIVE"]  # Toggle the value
+    save_settings(settings)  # Save updated settings
 
     return jsonify({"success": True, "LOTTERY_ACTIVE": settings["LOTTERY_ACTIVE"]})
-
-@admin_blueprint.route("/reset_lottery", methods=["POST"])
-def reset_lottery():
-    reset_draw()
-    return jsonify({"success": True})
-
-def truncate_tables():
-    try:
-        datasession.execute(text("TRUNCATE TABLE items CASCADE"))
-        datasession.execute(text("TRUNCATE TABLE users CASCADE"))
-        datasession.commit()
-        print("All tables truncated successfully.")
-    except Exception as e:
-        datasession.rollback()
-        print(f"Error truncating tables: {e}")
